@@ -8,7 +8,7 @@ start-backend:
 	npx start-server
 
 start:
-	make start-backend & make start-frontend
+	npx start-server -p 5001 -s ./frontend/build
 
 build:
 	rm frontend/build -rf
