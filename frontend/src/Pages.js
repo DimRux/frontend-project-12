@@ -1,6 +1,6 @@
 import { Formik, Form, Field } from 'formik';
 
-export const Page404 = () => <div>404 Not Found</div>
+export const Page404 = () => <div>404 Not Found or Found</div>
 export const LogIn = () => (
   <>
     <h1>Войти</h1>
