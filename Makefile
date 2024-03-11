@@ -8,7 +8,7 @@ start-backend:
 	npx start-server
 
 start:
-	npx start-server -p 5001 -s ./frontend/build
+	npm start
 
 build:
 	rm frontend/build -rf
