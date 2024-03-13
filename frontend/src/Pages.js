@@ -1,22 +1,36 @@
 import { Formik } from 'formik';
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import * as Yup from 'yup';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Form, Button } from 'react-bootstrap';
 import imageLogin from './images/page-login1.jpg';
+import { AuthorizationContext } from './context/AuthorizationContext';
 
 export const Page404 = () => {
   const navigate = useNavigate();
+  const { user } = useContext(AuthorizationContext);
+  console.log('user', user);
 
   useEffect(() => {
     const isAuthenticated = localStorage.getItem("isAuthenticated");
-    console.log(isAuthenticated)
     if (!isAuthenticated) {
       navigate("/login");
     }
   }, [navigate]);
+
+  useEffect(() => {
+    const requestData = async () => {
+      const data = await axios.get('/api/v1/channels', {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      });
+      console.log('>>>>>', data);
+    };
+    requestData();
+  }, [user.token]);
 
   return <div>Hellow World!</div>
 }
@@ -24,7 +38,7 @@ export const Page404 = () => {
 export const LogIn = () => {
   const navigate = useNavigate();
   const [error, setError] = useState('');
-  console.log(error);
+  const { setUser } = useContext(AuthorizationContext);
 
   const signupSchema = Yup.object().shape({
     name: Yup.string().required(),
@@ -53,8 +67,8 @@ export const LogIn = () => {
                   onSubmit={ async (values) => {
                     try {
                     const { name, password } = values;
-                    console.log(values)
-                    await axios.post('/api/v1/login', { username: name, password });
+                    const response = await axios.post('/api/v1/login', { username: name, password });
+                    setUser(JSON.parse(response.data));
                     localStorage.setItem('isAuthenticated', true);
                     setError('');
                     navigate('/');
