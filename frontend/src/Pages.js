@@ -4,14 +4,18 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import * as Yup from 'yup';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { useSelector, useDispatch } from 'react-redux';
+import { initChannels } from './slices/channelsSlice';
 import { Form, Button } from 'react-bootstrap';
 import imageLogin from './images/page-login1.jpg';
 import { AuthorizationContext } from './context/AuthorizationContext';
 
 export const Page404 = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const channels = useSelector((state) => state.channels);
   const { user } = useContext(AuthorizationContext);
-  console.log('user', user);
+  const { token } = JSON.parse(user);
 
   useEffect(() => {
     const isAuthenticated = localStorage.getItem("isAuthenticated");
@@ -24,13 +28,14 @@ export const Page404 = () => {
     const requestData = async () => {
       const data = await axios.get('/api/v1/channels', {
         headers: {
-          Authorization: `Bearer ${user.token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
-      console.log('>>>>>', data);
+      const newChannels = { channels: data.data, activeChannelId: 0 };
+      dispatch(initChannels(newChannels));
     };
     requestData();
-  }, [user.token]);
+  }, [token, dispatch]);
 
   return <div>Hellow World!</div>
 }
@@ -68,7 +73,7 @@ export const LogIn = () => {
                     try {
                     const { name, password } = values;
                     const response = await axios.post('/api/v1/login', { username: name, password });
-                    setUser(JSON.parse(response.data));
+                    setUser(JSON.stringify(response.data));
                     localStorage.setItem('isAuthenticated', true);
                     setError('');
                     navigate('/');
@@ -87,7 +92,7 @@ export const LogIn = () => {
                         autoComplete="name"
                         placeholder="Ваш ник"
                         className="form-control"
-                        value={values.username}
+                        value={values.name}
                         onChange={handleChange}
                         isValid={touched.name && !errors.name}
                         isInvalid={error !== ''}
