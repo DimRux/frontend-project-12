@@ -4,18 +4,33 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import * as Yup from 'yup';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { PlusSquare } from 'react-bootstrap-icons';
 import { useSelector, useDispatch } from 'react-redux';
 import { initChannels } from './slices/channelsSlice';
 import { Form, Button } from 'react-bootstrap';
 import imageLogin from './images/page-login1.jpg';
 import { AuthorizationContext } from './context/AuthorizationContext';
 
+const Chanel = ({ name }) => {
+  return (
+    <li className='nav-item w-100'>
+      <Button
+          type="button"
+          className="w-100 rounded-0 text-start btn btn-secondary"
+        >
+          <span className="me-1">#</span>
+          {name}
+        </Button>
+    </li>
+  )
+}
+
 export const Page404 = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const channels = useSelector((state) => state.channels);
+  const allChannels = useSelector((state) => state.channels);
   const { user } = useContext(AuthorizationContext);
-  const { token } = JSON.parse(user);
+  const { token } = user;
 
   useEffect(() => {
     const isAuthenticated = localStorage.getItem("isAuthenticated");
@@ -37,7 +52,39 @@ export const Page404 = () => {
     requestData();
   }, [token, dispatch]);
 
-  return <div>Hellow World!</div>
+  return (
+    <div className='h-100'>
+      <div className='h-100' id="chat">
+        <div className='d-flex flex-column h-100'>
+          <div className='container h-100 my-4 overflow-hidden rounded shadow'>
+            <div className='row h-100 bg-white flex-md-row'>
+              <div className='col-4 col-md-2 border-end px-0 bg-light flex-column h-100 d-flex'>
+                <div className='d-flex mt-1 justify-content-between mb-2 ps-4 pe-2 p-4'>
+                  <b>Каналы</b>
+                  <Button
+                    type="button"
+                    variant="group-vertical"
+                    className="p-0 text-primary"
+                    >
+                    <PlusSquare size={20} />
+                    <span className="visually-hidden">+</span>
+                  </Button>
+                </div>
+                <ul className='nav flex-column nav-pills nav-fill px-2 mb-3 overflow-auto h-100 d-block' id='channels-box'>
+                  {allChannels.channels.map(({ name }) => <Chanel name={name} />)}
+                </ul>
+              </div>
+              <div className='col p-0 h-100'>
+                <div className='d-flex flex-column h-100'>
+                  Loading messages
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
 }
 
 export const LogIn = () => {
@@ -73,7 +120,8 @@ export const LogIn = () => {
                     try {
                     const { name, password } = values;
                     const response = await axios.post('/api/v1/login', { username: name, password });
-                    setUser(JSON.stringify(response.data));
+                    console.log(response.data)
+                    setUser(response.data);
                     localStorage.setItem('isAuthenticated', true);
                     setError('');
                     navigate('/');
