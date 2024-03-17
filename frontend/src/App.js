@@ -3,13 +3,14 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import store from './slices/index.js';
 import { AuthorizationContext } from './context/AuthorizationContext';
-import { LogIn, Page404 } from './Pages';
-import { useState } from 'react';
+import { LogIn, Chat } from './Pages';
 
 const AuthorizationProvider = ({ children }) => {
-  const [user, setUser] = useState('');
+  const getToken = () => localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")).token : null;
+  const getUsername = () => localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")).username : null;
+
   return (
-    <AuthorizationContext.Provider value={{ user, setUser}}>
+    <AuthorizationContext.Provider value={{ getUsername, getToken}}>
       {children}
     </AuthorizationContext.Provider>
   )
@@ -22,7 +23,7 @@ function App() {
       <AuthorizationProvider>
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Page404 />} />
+            <Route path="/" element={<Chat />} />
             <Route path="/login" element={<LogIn />} />
           </Routes>
         </BrowserRouter>

@@ -1,43 +1,129 @@
-import { Formik } from 'formik';
+import { Formik, useFormik } from 'formik';
 import { useEffect, useState, useContext } from "react";
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import * as Yup from 'yup';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { PlusSquare } from 'react-bootstrap-icons';
+import { io } from 'socket.io-client';
+import { PlusSquare, ArrowRightSquare } from 'react-bootstrap-icons';
 import { useSelector, useDispatch } from 'react-redux';
-import { initChannels } from './slices/channelsSlice';
-import { Form, Button } from 'react-bootstrap';
+import { initMessages, addMessage } from './slices/messagesSlice';
+import { initChannels, changeChannelId } from './slices/channelsSlice';
+import { Form, Button, InputGroup } from 'react-bootstrap';
 import imageLogin from './images/page-login1.jpg';
 import { AuthorizationContext } from './context/AuthorizationContext';
 
-const Chanel = ({ name }) => {
+const Messages = () => {
+  const dispatch = useDispatch();
+  const { getToken } = useContext(AuthorizationContext);
+  const token = getToken();
+  const activeChannel = useSelector((state) => state.channels.activeChannelId);
+  const allMessages = useSelector((state) => state.messages);
+  const messages = allMessages.messages.filter(({ channelId }) => channelId === activeChannel);
+
+  useEffect(() => {
+    const requestData = async () => {
+      const data = await axios.get('/api/v1/messages', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      dispatch(initMessages(data.data));
+    };
+    requestData();
+  }, [token, dispatch]);
+
+  useEffect(() => {
+    const socket = io('http://localhost:3000');
+    socket.on('newMessage', (message) => {
+      dispatch(addMessage(message));
+    });
+  }, [dispatch]);
+
+  return (
+    messages.map(({ body, username}) => (
+      <div className='text-breack mb-2'>
+        <b>{username}</b>
+        {': '}
+        {body}
+      </div>
+    ))
+  );
+}
+
+const FormMessage = () => {
+  const { getToken, getUsername } = useContext(AuthorizationContext);
+  const channelId = useSelector((state) => state.channels.activeChannelId);
+
+  const formik = useFormik({
+    initialValues: { body: '' },
+    onSubmit: async ({ body }) => {
+      const newMessage = { body, channelId, username: getUsername() };
+      await axios.post('/api/v1/messages', newMessage, {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
+    },
+  });
+
+  return (
+    <Form noValidate className="py-1 rounded-2" onSubmit={formik.handleSubmit}>
+      <InputGroup className="mb-3">
+        <Form.Control
+          name="body"
+          onChange={formik.handleChange}
+          value={formik.values.body}
+          placeholder="Введите сообщение..."
+          aria-label="Введите сообщение"
+        />
+        <Button variant="group-vertical" type="submit">
+          <ArrowRightSquare size={20} />
+          <span className="visually-hidden" />
+        </Button>
+      </InputGroup>
+    </Form>
+  )
+}
+
+const Chanel = ({ name, id }) => {
+  const dispatch = useDispatch();
+
+  const changeChannel = () => dispatch(changeChannelId({ activeChannelId: id}));
+  
+
   return (
     <li className='nav-item w-100'>
       <Button
-          type="button"
-          className="w-100 rounded-0 text-start btn btn-secondary"
-        >
-          <span className="me-1">#</span>
-          {name}
-        </Button>
+        onClick={changeChannel}
+        type="button"
+        className="w-100 rounded-0 text-start btn btn-secondary"
+      >
+        <span className="me-1">#</span>
+        {name}
+      </Button>
     </li>
   )
 }
 
-export const Page404 = () => {
+export const Chat = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const allChannels = useSelector((state) => state.channels);
-  const { user } = useContext(AuthorizationContext);
-  const { token } = user;
+  const allMessages = useSelector((state) => state.messages);
+  const [ activeChannel ] = allChannels.channels.filter(({ id }) => id === allChannels.activeChannelId);
+  const messagesCount = activeChannel ? allMessages.messages.filter(({ channelId }) => channelId === activeChannel.id).length : 0;
+  const channelActive = activeChannel ? activeChannel.name : 'error';
+  const headChatMessage = `# ${channelActive}`;
+  const { getToken } = useContext(AuthorizationContext);
+  const token = getToken();
 
   useEffect(() => {
-    const isAuthenticated = localStorage.getItem("isAuthenticated");
+    const isAuthenticated = getToken();
     if (!isAuthenticated) {
       navigate("/login");
     }
-  }, [navigate]);
+  }, [getToken, navigate]);
 
   useEffect(() => {
     const requestData = async () => {
@@ -46,10 +132,13 @@ export const Page404 = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      const newChannels = { channels: data.data, activeChannelId: 0 };
+      const newChannels = { channels: data.data, activeChannelId: data.data[0].id };
       dispatch(initChannels(newChannels));
     };
-    requestData();
+    if (token) {
+      requestData();
+    }
+    
   }, [token, dispatch]);
 
   return (
@@ -71,12 +160,23 @@ export const Page404 = () => {
                   </Button>
                 </div>
                 <ul className='nav flex-column nav-pills nav-fill px-2 mb-3 overflow-auto h-100 d-block' id='channels-box'>
-                  {allChannels.channels.map(({ name }) => <Chanel name={name} />)}
+                  {allChannels.channels.map(({ name, id }) => <Chanel name={name} id={id} key={id} />)}
                 </ul>
               </div>
               <div className='col p-0 h-100'>
                 <div className='d-flex flex-column h-100'>
-                  Loading messages
+                  <div className='bg-light mb-4 p-3 shadow-sm small'>
+                    <p className='m-0'>
+                      <b>{headChatMessage}</b>
+                    </p>
+                    <span className='text-muted'>{messagesCount} сообщения</span>
+                  </div>
+                  <div id='message-box' className='chat-messages overflow-auto px-5'>
+                    <Messages />
+                  </div>
+                  <div className='mt-auto px-5 py-3'>
+                    <FormMessage />
+                  </div>
                 </div>
               </div>
             </div>
@@ -90,7 +190,6 @@ export const Page404 = () => {
 export const LogIn = () => {
   const navigate = useNavigate();
   const [error, setError] = useState('');
-  const { setUser } = useContext(AuthorizationContext);
 
   const signupSchema = Yup.object().shape({
     name: Yup.string().required(),
@@ -120,9 +219,7 @@ export const LogIn = () => {
                     try {
                     const { name, password } = values;
                     const response = await axios.post('/api/v1/login', { username: name, password });
-                    console.log(response.data)
-                    setUser(response.data);
-                    localStorage.setItem('isAuthenticated', true);
+                    localStorage.setItem('user', JSON.stringify(response.data));
                     setError('');
                     navigate('/');
                     } catch (e) {
