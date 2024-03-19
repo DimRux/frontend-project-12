@@ -14,6 +14,7 @@ import imageLogin from './images/page-login1.jpg';
 import { AuthorizationContext } from './context/AuthorizationContext';
 
 const Messages = () => {
+  const socket = io('http://localhost:3000');
   const dispatch = useDispatch();
   const { getToken } = useContext(AuthorizationContext);
   const token = getToken();
@@ -30,18 +31,22 @@ const Messages = () => {
       });
       dispatch(initMessages(data.data));
     };
-    requestData();
+    if (token) {
+      requestData();
+    }
   }, [token, dispatch]);
 
   useEffect(() => {
-    const socket = io('http://localhost:3000');
     socket.on('newMessage', (message) => {
+    const messageExists = messages.some((m) => m.id === message.id);
+    if (!messageExists) {
       dispatch(addMessage(message));
+    }
     });
-  }, [dispatch]);
+  }, [dispatch, messages, socket]);
 
   return (
-    messages.map(({ body, username}) => (
+    messages.map(({ body, username }) => (
       <div className='text-breack mb-2'>
         <b>{username}</b>
         {': '}
@@ -109,12 +114,6 @@ const Chanel = ({ name, id }) => {
 export const Chat = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const allChannels = useSelector((state) => state.channels);
-  const allMessages = useSelector((state) => state.messages);
-  const [ activeChannel ] = allChannels.channels.filter(({ id }) => id === allChannels.activeChannelId);
-  const messagesCount = activeChannel ? allMessages.messages.filter(({ channelId }) => channelId === activeChannel.id).length : 0;
-  const channelActive = activeChannel ? activeChannel.name : 'error';
-  const headChatMessage = `# ${channelActive}`;
   const { getToken } = useContext(AuthorizationContext);
   const token = getToken();
 
@@ -140,6 +139,16 @@ export const Chat = () => {
     }
     
   }, [token, dispatch]);
+
+  const allChannels = useSelector((state) => state.channels);
+  const allMessages = useSelector((state) => state.messages);
+  const [ activeChannel ] = allChannels.channels.filter(({ id }) => id === allChannels.activeChannelId);
+  if (!activeChannel) {
+    return <div className="spinner-border" role="status" />
+  }
+  const messagesCount = allMessages.messages.filter(({ channelId }) => channelId === activeChannel.id).length;
+  const channelActive = activeChannel.name;
+  const headChatMessage = `# ${channelActive}`;
 
   return (
     <div className='h-100'>
