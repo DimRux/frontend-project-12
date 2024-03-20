@@ -7,7 +7,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { PlusSquare, ArrowRightSquare } from 'react-bootstrap-icons';
 import { useSelector, useDispatch } from 'react-redux';
 import { initMessages, addMessage } from './slices/messagesSlice';
-import { initChannels, changeChannelId, addChannel, editChannel } from './slices/channelsSlice';
+import { initChannels, changeChannelId, addChannel, editChannel, removeChannel } from './slices/channelsSlice';
 import { Form, Button, InputGroup, Modal, ButtonGroup, Dropdown } from 'react-bootstrap';
 import imageLogin from './images/page-login1.jpg';
 import { AuthorizationContext } from './context/AuthorizationContext';
@@ -51,8 +51,8 @@ const Messages = () => {
 
 
   return (
-    messages.map(({ body, username }) => (
-      <div className='text-breack mb-2'>
+    messages.map(({ body, username, id }) => (
+      <div key={id} className='text-breack mb-2'>
         <b>{username}</b>
         {': '}
         {body}
@@ -116,11 +116,18 @@ const ChanelServer = ({ name, id }) => {
   )
 }
 
-const ChanelUser = ({ name, id, setModalVariant }) => {
+const ChanelUser = ({ name, id, handleShow, setModalVariant }) => {
   const dispatch = useDispatch();
 
   const changeChannel = () => dispatch(changeChannelId({ activeChannelId: id}));
-  const renameChannel = () => setModalVariant('editChannel');
+  const renameChannel = () => {
+    setModalVariant('editChannel');
+    handleShow();
+  }
+  const removeChannel$ = () => {
+    setModalVariant('removeChannel');
+    handleShow();
+  }
 
   return (
     <li className='nav-item w-100'>
@@ -146,7 +153,7 @@ const ChanelUser = ({ name, id, setModalVariant }) => {
             </Dropdown.Toggle>
             
             <Dropdown.Menu>
-              <Dropdown.Item >
+              <Dropdown.Item onClick={removeChannel$}>
                 Удалить
               </Dropdown.Item>
               <Dropdown.Item onClick={renameChannel}>
@@ -157,6 +164,60 @@ const ChanelUser = ({ name, id, setModalVariant }) => {
       </Dropdown>
     </li>
   )
+}
+
+const RemoveChannelModal = ({ show, handleClose }) => {
+  const dispatch = useDispatch();
+  const channelId = useSelector((state) => state.channels.activeChannelId);
+  const { getToken } = useContext(AuthorizationContext);
+  const token = getToken();
+  
+  const handleRemove = async () => {
+    const response = await axios.delete(`/api/v1/channels/${channelId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    dispatch(removeChannel(response.data));
+    handleClose();
+  }
+
+  return (
+    <Modal show={show} onHide={handleClose}>
+      <Modal.Header>
+        <Modal.Title>
+          Удалить канал
+        </Modal.Title>
+        <Button
+          variant="close"
+          type="button"
+          onClick={handleClose}
+          aria-label="Close"
+          data-bs-dismiss="modal"
+        />
+      </Modal.Header>
+      <Modal.Body>
+        <p className="lead">Уверены?</p>
+        <div className="d-flex justify-content-end">
+          <Button
+            className="me-2"
+            variant="secondary"
+            type="button"
+            onClick={handleClose}
+          >
+            Отменить
+          </Button>
+          <Button
+            variant="danger"
+            type="button"
+            onClick={handleRemove}
+          >
+            Удалить
+          </Button>
+        </div>
+      </Modal.Body>
+    </Modal>
+  );
 }
 
 const EditChannelModal = ({ show, handleClose }) => {
@@ -199,7 +260,6 @@ const EditChannelModal = ({ show, handleClose }) => {
                 Authorization: `Bearer ${token}`,
               },
               });
-              console.log(response);
               dispatch(editChannel(response.data));
               handleClose();
           }}
@@ -356,10 +416,12 @@ export const Chat = () => {
   const [modalVariant, setModalVariant] = useState('addChannel');
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
-  const handleShow = () => {
+  const handleShow = () => setShow(true);
+  const addNewChannel = () => {
     setModalVariant('addChannel');
-    setShow(true);
+    handleShow();
   }
+
 
 
   useEffect(() => {
@@ -402,6 +464,9 @@ export const Chat = () => {
     if (modalVariant === 'editChannel') {
       return <EditChannelModal show={show} handleClose={handleClose} />;
     }
+    if (modalVariant === 'removeChannel') {
+      return <RemoveChannelModal show={show} handleClose={handleClose} />;
+    }
   };
 
   return (
@@ -417,14 +482,14 @@ export const Chat = () => {
                     type="button"
                     variant="group-vertical"
                     className="p-0 text-primary"
-                    onClick={handleShow}
+                    onClick={addNewChannel}
                     >
                     <PlusSquare size={20} />
                     <span className="visually-hidden">+</span>
                   </Button>
                 </div>
                 <ul className='nav flex-column nav-pills nav-fill px-2 mb-3 overflow-auto h-100 d-block' id='channels-box'>
-                  {allChannels.channels.map(({ name, removable, id }) => removable ? <ChanelUser name={name} id={id} key={id} setModalVariant={setModalVariant} />
+                  {allChannels.channels.map(({ name, removable, id }) => removable ? <ChanelUser name={name} id={id} key={id} handleShow={handleShow} setModalVariant={setModalVariant} />
                   : 
                   <ChanelServer name={name} id={id} key={id} setModalVariant={setModalVariant}/>)}
                 </ul>
