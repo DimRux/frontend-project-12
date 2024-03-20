@@ -4,19 +4,17 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import * as Yup from 'yup';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { io } from 'socket.io-client';
 import { PlusSquare, ArrowRightSquare } from 'react-bootstrap-icons';
 import { useSelector, useDispatch } from 'react-redux';
 import { initMessages, addMessage } from './slices/messagesSlice';
-import { initChannels, changeChannelId } from './slices/channelsSlice';
-import { Form, Button, InputGroup } from 'react-bootstrap';
+import { initChannels, changeChannelId, addChannel, editChannel } from './slices/channelsSlice';
+import { Form, Button, InputGroup, Modal, ButtonGroup, Dropdown } from 'react-bootstrap';
 import imageLogin from './images/page-login1.jpg';
 import { AuthorizationContext } from './context/AuthorizationContext';
 
 const Messages = () => {
-  const socket = io('http://localhost:3000');
   const dispatch = useDispatch();
-  const { getToken } = useContext(AuthorizationContext);
+  const { getToken, socket } = useContext(AuthorizationContext);
   const token = getToken();
   const activeChannel = useSelector((state) => state.channels.activeChannelId);
   const allMessages = useSelector((state) => state.messages);
@@ -34,16 +32,23 @@ const Messages = () => {
     if (token) {
       requestData();
     }
-  }, [token, dispatch]);
+  }, []);
 
-  useEffect(() => {
-    socket.on('newMessage', (message) => {
-    const messageExists = messages.some((m) => m.id === message.id);
-    if (!messageExists) {
+  const handleNewMessage = (message) => {
+    const existingMessage = allMessages.messages.find((m) => m.id === message.id);
+    if (!existingMessage) {
       dispatch(addMessage(message));
     }
-    });
-  }, [dispatch, messages, socket]);
+  };
+
+  useEffect(() => {
+    socket.on('newMessage', handleNewMessage);
+    return () => {
+      socket.off('newMessage', handleNewMessage);
+    };
+  }, [socket, allMessages]);
+
+
 
   return (
     messages.map(({ body, username }) => (
@@ -91,7 +96,7 @@ const FormMessage = () => {
   )
 }
 
-const Chanel = ({ name, id }) => {
+const ChanelServer = ({ name, id }) => {
   const dispatch = useDispatch();
 
   const changeChannel = () => dispatch(changeChannelId({ activeChannelId: id}));
@@ -111,11 +116,251 @@ const Chanel = ({ name, id }) => {
   )
 }
 
+const ChanelUser = ({ name, id, setModalVariant }) => {
+  const dispatch = useDispatch();
+
+  const changeChannel = () => dispatch(changeChannelId({ activeChannelId: id}));
+  const renameChannel = () => setModalVariant('editChannel');
+
+  return (
+    <li className='nav-item w-100'>
+    <Dropdown as={ButtonGroup} className="d-flex" onClick={changeChannel}>
+        <Button
+          type="button"
+          className="w-100 rounded-0 text-start text-truncate btn"
+          variant={'secondary'}
+        >
+          <span className="me-1">#</span>
+          {name}
+        </Button>
+        
+          
+            <Dropdown.Toggle
+              split
+              className="flex-grow-0"
+              variant={'secondary'}
+            >
+              <span className="visually-hidden">
+                Удалить/Переименовать
+              </span>
+            </Dropdown.Toggle>
+            
+            <Dropdown.Menu>
+              <Dropdown.Item >
+                Удалить
+              </Dropdown.Item>
+              <Dropdown.Item onClick={renameChannel}>
+                Изменить
+              </Dropdown.Item>
+            </Dropdown.Menu>
+          
+      </Dropdown>
+    </li>
+  )
+}
+
+const EditChannelModal = ({ show, handleClose }) => {
+  const dispatch = useDispatch();
+  const channelId = useSelector((state) => state.channels.activeChannelId);
+  const channels = useSelector((state) => state.channels.channels);
+  const { getToken } = useContext(AuthorizationContext);
+  const token = getToken();
+  
+
+  const signupSchema = Yup.object().shape({
+    name: Yup.string()
+    .trim()
+    .required('Обязательное поле')
+    .min(3, 'от 3 до 20 символов')
+    .max(20, 'от 3 до 20 символов')
+    .notOneOf(channels.map(({ name }) => name), 'Должно быть уникальным'),
+  });
+
+  return (
+    <Modal show={show} onHide={handleClose}>
+      <Modal.Header>
+        <Modal.Title>Переименовать канал</Modal.Title>
+        <Button
+          variant="close"
+          type="button"
+          onClick={handleClose}
+          aria-label="Close"
+          data-bs-dismiss="modal"
+        />
+      </Modal.Header>
+      <Modal.Body>
+        <Formik
+          initialValues={{ name: '' }}
+          validationSchema={signupSchema}
+          onSubmit={async (values) => {
+            const { name } = values;
+            const response = await axios.patch(`/api/v1/channels/${channelId}`, { name }, {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+              });
+              console.log(response);
+              dispatch(editChannel(response.data));
+              handleClose();
+          }}
+        >
+          {({
+            handleSubmit,
+            handleChange,
+            values,
+            errors,
+          }) => (
+            <Form onSubmit={handleSubmit}>
+              <Form.Group>
+                <Form.Control
+                  type="text"
+                  name="name"
+                  className="mb-2"
+                  autoFocus="true"
+                  value={values.name}
+                  onChange={handleChange}
+                  isInvalid={errors.name}
+                />
+                <label className="visually-hidden" htmlFor="name">
+                  Имя канала
+                </label>
+                {errors.name ? (
+                  <Form.Control.Feedback type="invalid">
+                    {errors.name}
+                  </Form.Control.Feedback>
+                ) : null}
+              </Form.Group>
+              <div className="d-flex justify-content-end">
+                <Button
+                  className="me-2"
+                  variant="secondary"
+                  type="button"
+                  onClick={handleClose}
+                >
+                  Отменить
+                </Button>
+                <Button
+                  variant="primary"
+                  type="submit"
+                >
+                  Отправить
+                </Button>
+              </div>
+            </Form>
+          )}
+        </Formik>
+      </Modal.Body>
+    </Modal>
+  );
+}
+
+const ModalWindow = ({ show, handleClose }) => {
+  const dispatch = useDispatch();
+  const channels = useSelector((state) => state.channels.channels);
+  const { getToken } = useContext(AuthorizationContext);
+  const token = getToken();
+  
+
+  const signupSchema = Yup.object().shape({
+    name: Yup.string()
+    .trim()
+    .required('Обязательное поле')
+    .min(3, 'от 3 до 20 символов')
+    .max(20, 'от 3 до 20 символов')
+    .notOneOf(channels.map(({ name }) => name), 'Должно быть уникальным'),
+  });
+
+  return (
+    <Modal show={show} onHide={handleClose}>
+      <Modal.Header>
+        <Modal.Title>Добавить канал</Modal.Title>
+        <Button
+          variant="close"
+          type="button"
+          onClick={handleClose}
+          aria-label="Close"
+          data-bs-dismiss="modal"
+        />
+      </Modal.Header>
+      <Modal.Body>
+        <Formik
+          initialValues={{ name: '' }}
+          validationSchema={signupSchema}
+          onSubmit={async (values) => {
+            const { name } = values;
+            const response = await axios.post('/api/v1/channels', { name }, {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+              });
+              const newChannel = { channel: response.data, activeChannelId: response.data.id };
+              dispatch(addChannel(newChannel))
+              handleClose();
+          }}
+        >
+          {({
+            handleSubmit,
+            handleChange,
+            values,
+            errors,
+          }) => (
+            <Form onSubmit={handleSubmit}>
+              <Form.Group>
+                <Form.Control
+                  type="text"
+                  name="name"
+                  className="mb-2"
+                  autoFocus="true"
+                  value={values.name}
+                  onChange={handleChange}
+                  isInvalid={errors.name}
+                />
+                <label className="visually-hidden" htmlFor="name">
+                  Имя канала
+                </label>
+                {errors.name ? (
+                  <Form.Control.Feedback type="invalid">
+                    {errors.name}
+                  </Form.Control.Feedback>
+                ) : null}
+              </Form.Group>
+              <div className="d-flex justify-content-end">
+                <Button
+                  className="me-2"
+                  variant="secondary"
+                  type="button"
+                  onClick={handleClose}
+                >
+                  Отменить
+                </Button>
+                <Button
+                  variant="primary"
+                  type="submit"
+                >
+                  Отправить
+                </Button>
+              </div>
+            </Form>
+          )}
+        </Formik>
+      </Modal.Body>
+    </Modal>
+  );
+}
+
 export const Chat = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { getToken } = useContext(AuthorizationContext);
   const token = getToken();
+  const [modalVariant, setModalVariant] = useState('addChannel');
+  const [show, setShow] = useState(false);
+  const handleClose = () => setShow(false);
+  const handleShow = () => {
+    setModalVariant('addChannel');
+    setShow(true);
+  }
+
 
   useEffect(() => {
     const isAuthenticated = getToken();
@@ -150,6 +395,15 @@ export const Chat = () => {
   const channelActive = activeChannel.name;
   const headChatMessage = `# ${channelActive}`;
 
+  const renderModal = () => {
+    if (modalVariant === 'addChannel') {
+      return <ModalWindow show={show} handleClose={handleClose} />;
+    }
+    if (modalVariant === 'editChannel') {
+      return <EditChannelModal show={show} handleClose={handleClose} />;
+    }
+  };
+
   return (
     <div className='h-100'>
       <div className='h-100' id="chat">
@@ -163,13 +417,16 @@ export const Chat = () => {
                     type="button"
                     variant="group-vertical"
                     className="p-0 text-primary"
+                    onClick={handleShow}
                     >
                     <PlusSquare size={20} />
                     <span className="visually-hidden">+</span>
                   </Button>
                 </div>
                 <ul className='nav flex-column nav-pills nav-fill px-2 mb-3 overflow-auto h-100 d-block' id='channels-box'>
-                  {allChannels.channels.map(({ name, id }) => <Chanel name={name} id={id} key={id} />)}
+                  {allChannels.channels.map(({ name, removable, id }) => removable ? <ChanelUser name={name} id={id} key={id} setModalVariant={setModalVariant} />
+                  : 
+                  <ChanelServer name={name} id={id} key={id} setModalVariant={setModalVariant}/>)}
                 </ul>
               </div>
               <div className='col p-0 h-100'>
@@ -192,6 +449,7 @@ export const Chat = () => {
           </div>
         </div>
       </div>
+      {renderModal()}
     </div>
   )
 }

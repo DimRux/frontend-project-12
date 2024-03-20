@@ -1,3 +1,3 @@
 import { createContext } from 'react';
 
-export const AuthorizationContext = createContext({ getUsername: () => {}, getToken: () => {} });
+export const AuthorizationContext = createContext({ socket: null, getUsername: () => {}, getToken: () => {} });

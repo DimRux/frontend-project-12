@@ -14,4 +14,4 @@
 </ul>
 
 <h2>How it works:</h2>
-<p>To use the application, go to https://frontend-project-12-xnfa.onrender.com</p>
+<p>To use the application, go to https://chat-dxu9.onrender.com</p>
