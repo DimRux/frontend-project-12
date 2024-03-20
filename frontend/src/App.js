@@ -9,7 +9,7 @@ import { LogIn, Chat } from './Pages';
 const AuthorizationProvider = ({ children }) => {
   const getToken = () => localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")).token : null;
   const getUsername = () => localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")).username : null;
-  const socket = io('http://localhost:3000');
+  const socket = io();
 
   return (
     <AuthorizationContext.Provider value={{ socket, getUsername, getToken}}>
