@@ -6,6 +6,7 @@ import store from './slices/index.js';
 import { AuthorizationContext } from './context/AuthorizationContext';
 import { LogIn } from './Components/LogIn.js';
 import { Chat } from './Components/Chat.js';
+import { SignUp } from './Components/SignUp.js'
 
 const AuthorizationProvider = ({ children }) => {
   const getToken = () => localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")).token : null;
@@ -27,6 +28,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Chat />} />
             <Route path="/login" element={<LogIn />} />
+            <Route path="/signup" element={<SignUp />} />
           </Routes>
         </BrowserRouter>
       </AuthorizationProvider>
