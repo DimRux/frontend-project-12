@@ -1,13 +1,15 @@
 import { useFormik } from 'formik';
-import { useContext } from "react";
+import { useContext } from 'react';
 import axios from 'axios';
 import { ArrowRightSquare } from 'react-bootstrap-icons';
 import { useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Form, Button, InputGroup } from 'react-bootstrap';
-import { AuthorizationContext } from '../../context/AuthorizationContext';
+import AuthorizationContext from '../../context/AuthorizationContext';
 
-export const FormMessage = () => {
+const FormMessage = () => {
+  const { t } = useTranslation();
   const { getToken, getUsername } = useContext(AuthorizationContext);
   const channelId = useSelector((state) => state.channels.activeChannelId);
 
@@ -19,7 +21,7 @@ export const FormMessage = () => {
         headers: {
           Authorization: `Bearer ${getToken()}`,
         },
-      })
+      });
     },
   });
 
@@ -30,7 +32,7 @@ export const FormMessage = () => {
           name="body"
           onChange={formik.handleChange}
           value={formik.values.body}
-          placeholder="Введите сообщение..."
+          placeholder={t('formMessage')}
           aria-label="Введите сообщение"
         />
         <Button variant="group-vertical" type="submit">
@@ -39,5 +41,7 @@ export const FormMessage = () => {
         </Button>
       </InputGroup>
     </Form>
-  )
-}
+  );
+};
+
+export default FormMessage;

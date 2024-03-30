@@ -1,9 +1,16 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useSelector, useDispatch } from 'react-redux';
 import { Button, ButtonGroup, Dropdown } from 'react-bootstrap';
+import { useTranslation } from 'react-i18next';
 import { changeChannelId } from '../../slices/channelsSlice';
 
-export const ChanelUser = ({ name, id, handleShow, setModalVariant }) => {
+const ChanelUser = ({
+  name,
+  id,
+  handleShow,
+  setModalVariant,
+}) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const channelId = useSelector((state) => state.channels.activeChannelId);
 
@@ -11,14 +18,14 @@ export const ChanelUser = ({ name, id, handleShow, setModalVariant }) => {
   const renameChannel = () => {
     setModalVariant('editChannel');
     handleShow();
-  }
+  };
   const removeChannel$ = () => {
     setModalVariant('removeChannel');
     handleShow();
-  }
+  };
 
   return (
-    <li className='nav-item w-100'>
+    <li className="nav-item w-100">
       <Dropdown as={ButtonGroup} className="d-flex" onClick={changeChannel}>
         <Button
           type="button"
@@ -29,27 +36,28 @@ export const ChanelUser = ({ name, id, handleShow, setModalVariant }) => {
           {name}
         </Button>
 
-
         <Dropdown.Toggle
           split
           className="flex-grow-0"
           variant={id === channelId ? 'secondary' : null}
         >
           <span className="visually-hidden">
-            Удалить/Переименовать
+            {t('channelUser.delEdit')}
           </span>
         </Dropdown.Toggle>
 
         <Dropdown.Menu>
           <Dropdown.Item onClick={removeChannel$}>
-            Удалить
+            {t('channelUser.del')}
           </Dropdown.Item>
           <Dropdown.Item onClick={renameChannel}>
-            Изменить
+            {t('channelUser.edit')}
           </Dropdown.Item>
         </Dropdown.Menu>
 
       </Dropdown>
     </li>
-  )
-}
+  );
+};
+
+export default ChanelUser;

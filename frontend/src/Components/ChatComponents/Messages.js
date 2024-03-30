@@ -1,10 +1,10 @@
-import { useEffect, useContext } from "react";
+import { useEffect, useContext } from 'react';
 import axios from 'axios';
 import { useSelector, useDispatch } from 'react-redux';
-import { AuthorizationContext } from "../../context/AuthorizationContext";
-import { addMessage, initMessages } from "../../slices/messagesSlice";
+import AuthorizationContext from '../../context/AuthorizationContext';
+import { addMessage, initMessages } from '../../slices/messagesSlice';
 
-export const Messages = () => {
+const Messages = () => {
   const dispatch = useDispatch();
   const { getToken, socket } = useContext(AuthorizationContext);
   const token = getToken();
@@ -42,11 +42,13 @@ export const Messages = () => {
 
   return (
     messages.map(({ body, username, id }) => (
-      <div key={id} className='text-breack mb-2'>
+      <div key={id} className="text-breack mb-2">
         <b>{username}</b>
         {': '}
         {body}
       </div>
     ))
   );
-}
+};
+
+export default Messages;

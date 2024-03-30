@@ -1,28 +1,27 @@
 import { Formik } from 'formik';
-import { useState } from "react";
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import * as Yup from 'yup';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import imageLogin from '../images/page-login1.jpg';
 import { Form, Button } from 'react-bootstrap';
+import Nav from './Nav';
+import imageLogin from '../images/page-login1.jpg';
 
-export const LogIn = () => {
+const LogIn = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [error, setError] = useState('');
 
   const signupSchema = Yup.object().shape({
     name: Yup.string().required(),
-    password: Yup.string().required()
+    password: Yup.string().required(),
   });
 
   return (
-    <div className='d-flex flex-column h-100'>
-      <nav className='shadow-sm navbar navbar-expand-lg navbar-light bg-white'>
-        <div className='container'>
-          <a className='navbar-brand' href='/'>Hexlet Chat</a>
-        </div>
-      </nav>
+    <div className="d-flex flex-column h-100">
+      <Nav button="no" />
       <div className="container-fluid h-100">
         <div className="row justify-content-center align-content-center h-100">
           <div className="col-12 col-md-8 col-xxl-6">
@@ -49,26 +48,32 @@ export const LogIn = () => {
                       setError('');
                       navigate('/');
                     } catch (e) {
-                      setError('Неверное имя пользователя или пароль');
+                      setError(t('errors.singUp.confirmPassword'));
                     }
                   }}
                 >
-                  {({ errors, touched, values, handleSubmit, handleChange }) => (
+                  {({
+                    errors,
+                    touched,
+                    values,
+                    handleSubmit,
+                    handleChange,
+                  }) => (
                     <Form className="col-12 col-md-6 mt-3 mt-mb-0" onSubmit={handleSubmit}>
-                      <h1 className="text-center mb-4">Войти</h1>
+                      <h1 className="text-center mb-4">{t('logIn.h1')}</h1>
                       <Form.Group className="form-floating mb-3">
                         <Form.Control
                           name="name"
                           id="name"
                           autoComplete="name"
-                          placeholder="Ваш ник"
+                          placeholder={t('logIn.name')}
                           className="form-control"
                           value={values.name}
                           onChange={handleChange}
                           isValid={touched.name && !errors.name}
                           isInvalid={error !== ''}
                         />
-                        <label className="form-label" htmlFor="name">Ваш ник</label>
+                        <Form.Label className="form-label">{t('logIn.name')}</Form.Label>
                       </Form.Group>
 
                       <Form.Group className="form-floating mb-4">
@@ -77,31 +82,31 @@ export const LogIn = () => {
                           name="password"
                           id="password"
                           autoComplete="password"
-                          placeholder="Пароль"
+                          placeholder={t('logIn.password')}
                           className="form-control"
                           value={values.password}
                           onChange={handleChange}
                           isValid={touched.password && !errors.password}
                           isInvalid={error !== ''}
                         />
+                        <Form.Label className="form-label">{t('logIn.password')}</Form.Label>
                         {error && <Form.Control.Feedback type="invalid">{error}</Form.Control.Feedback>}
-                        <label className="form-label" htmlFor="password">Пароль</label>
                       </Form.Group>
                       <Button
                         type="submit"
                         variant="outline-primary"
                         className="w-100 mb-3"
                       >
-                        Войти
+                        {t('logIn.button')}
                       </Button>
                     </Form>
                   )}
                 </Formik>
               </div>
-              <div className='card-footer p-4'>
-                <div className='text-center'>
-                  <span>Нет аккаунта? </span>
-                  <a href='/signup'>Регистрация</a>
+              <div className="card-footer p-4">
+                <div className="text-center">
+                  <span>{t('logIn.footer.span')}</span>
+                  <a href="/signup">{t('logIn.footer.a')}</a>
                 </div>
               </div>
             </div>
@@ -110,4 +115,6 @@ export const LogIn = () => {
       </div>
     </div>
   );
-}
+};
+
+export default LogIn;

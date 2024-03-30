@@ -1,15 +1,17 @@
 import { Formik } from 'formik';
-import { useContext } from "react";
+import { useContext } from 'react';
 import axios from 'axios';
 import * as Yup from 'yup';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { useTranslation } from 'react-i18next';
 import { useSelector, useDispatch } from 'react-redux';
-import { addChannel } from '../../slices/channelsSlice';
 import { Form, Button, Modal } from 'react-bootstrap';
-import { AuthorizationContext } from '../../context/AuthorizationContext';
-import { toastify } from "../../Toastify";
+import { addChannel } from '../../slices/channelsSlice';
+import AuthorizationContext from '../../context/AuthorizationContext';
+import toastify from '../../toastify';
 
-export const AddChannelModal = ({ show, handleClose }) => {
+const AddChannelModal = ({ show, handleClose }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const channels = useSelector((state) => state.channels.channels);
   const { getToken } = useContext(AuthorizationContext);
@@ -18,16 +20,16 @@ export const AddChannelModal = ({ show, handleClose }) => {
   const signupSchema = Yup.object().shape({
     name: Yup.string()
       .trim()
-      .required('Обязательное поле')
-      .min(3, 'от 3 до 20 символов')
-      .max(20, 'от 3 до 20 символов')
-      .notOneOf(channels.map(({ name }) => name), 'Должно быть уникальным'),
+      .required(t('errors.addChannelModal.name.req'))
+      .min(3, t('errors.addChannelModal.name.minMax'))
+      .max(20, t('errors.addChannelModal.name.minMax'))
+      .notOneOf(channels.map(({ name }) => name), t('errors.addChannelModal.name.uniq')),
   });
 
   return (
     <Modal show={show} onHide={handleClose}>
       <Modal.Header>
-        <Modal.Title>Добавить канал</Modal.Title>
+        <Modal.Title>{t('addChannelModal.title')}</Modal.Title>
         <Button
           variant="close"
           type="button"
@@ -49,11 +51,11 @@ export const AddChannelModal = ({ show, handleClose }) => {
                 },
               });
               const newChannel = { channel: response.data, activeChannelId: response.data.id };
-              dispatch(addChannel(newChannel))
+              dispatch(addChannel(newChannel));
               handleClose();
-              toastify('Канал добавлен', 'success');
+              toastify(t('addChannelModal.postFeedback'), 'success');
             } catch {
-              toastify('Ошибка сети', 'error');
+              toastify(t('errors.network'), 'error');
             }
           }}
         >
@@ -73,10 +75,9 @@ export const AddChannelModal = ({ show, handleClose }) => {
                   value={values.name}
                   onChange={handleChange}
                   isInvalid={errors.name}
+                  id="name"
                 />
-                <label className="visually-hidden" htmlFor="name">
-                  Имя канала
-                </label>
+                <Form.Label className="visually-hidden">{t('addChannelModal.name')}</Form.Label>
                 {errors.name ? (
                   <Form.Control.Feedback type="invalid">
                     {errors.name}
@@ -90,13 +91,13 @@ export const AddChannelModal = ({ show, handleClose }) => {
                   type="button"
                   onClick={handleClose}
                 >
-                  Отменить
+                  {t('addChannelModal.buttonClose')}
                 </Button>
                 <Button
                   variant="primary"
                   type="submit"
                 >
-                  Отправить
+                  {t('addChannelModal.buttonAdd')}
                 </Button>
               </div>
             </Form>
@@ -105,4 +106,6 @@ export const AddChannelModal = ({ show, handleClose }) => {
       </Modal.Body>
     </Modal>
   );
-}
+};
+
+export default AddChannelModal;

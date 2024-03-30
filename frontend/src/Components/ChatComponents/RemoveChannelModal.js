@@ -1,13 +1,15 @@
-import { useContext } from "react";
+import { useContext } from 'react';
+import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useSelector, useDispatch } from 'react-redux';
 import { Button, Modal } from 'react-bootstrap';
-import { AuthorizationContext } from "../../context/AuthorizationContext";
-import { removeChannel } from "../../slices/channelsSlice";
-import { toastify } from "../../Toastify";
+import AuthorizationContext from '../../context/AuthorizationContext';
+import { removeChannel } from '../../slices/channelsSlice';
+import toastify from '../../toastify';
 
-export const RemoveChannelModal = ({ show, handleClose }) => {
+const RemoveChannelModal = ({ show, handleClose }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const channelId = useSelector((state) => state.channels.activeChannelId);
   const { getToken } = useContext(AuthorizationContext);
@@ -22,17 +24,17 @@ export const RemoveChannelModal = ({ show, handleClose }) => {
       });
       dispatch(removeChannel(response.data));
       handleClose();
-      toastify('Канал удален', 'success');
+      toastify(t('removeChannelModal.postFeedback'), 'success');
     } catch {
-      toastify('Ошибка сети', 'error');
+      toastify(t('errors.network'), 'error');
     }
-  }
+  };
 
   return (
     <Modal show={show} onHide={handleClose}>
       <Modal.Header>
         <Modal.Title>
-          Удалить канал
+          {t('removeChannelModal.title')}
         </Modal.Title>
         <Button
           variant="close"
@@ -43,7 +45,7 @@ export const RemoveChannelModal = ({ show, handleClose }) => {
         />
       </Modal.Header>
       <Modal.Body>
-        <p className="lead">Уверены?</p>
+        <p className="lead">{t('removeChannelModal.p')}</p>
         <div className="d-flex justify-content-end">
           <Button
             className="me-2"
@@ -51,17 +53,19 @@ export const RemoveChannelModal = ({ show, handleClose }) => {
             type="button"
             onClick={handleClose}
           >
-            Отменить
+            {t('removeChannelModal.buttonClose')}
           </Button>
           <Button
             variant="danger"
             type="button"
             onClick={handleRemove}
           >
-            Удалить
+            {t('removeChannelModal.buttonAdd')}
           </Button>
         </div>
       </Modal.Body>
     </Modal>
   );
-}
+};
+
+export default RemoveChannelModal;

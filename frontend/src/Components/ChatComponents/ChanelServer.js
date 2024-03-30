@@ -3,14 +3,14 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Button } from 'react-bootstrap';
 import { changeChannelId } from '../../slices/channelsSlice';
 
-export const ChanelServer = ({ name, id }) => {
+const ChanelServer = ({ name, id }) => {
   const dispatch = useDispatch();
   const channelId = useSelector((state) => state.channels.activeChannelId);
 
   const changeChannel = () => dispatch(changeChannelId({ activeChannelId: id }));
 
   return (
-    <li className='nav-item w-100'>
+    <li className="nav-item w-100">
       <Button
         onClick={changeChannel}
         type="button"
@@ -21,5 +21,7 @@ export const ChanelServer = ({ name, id }) => {
         {name}
       </Button>
     </li>
-  )
-}
+  );
+};
+
+export default ChanelServer;

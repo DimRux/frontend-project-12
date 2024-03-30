@@ -1,32 +1,31 @@
 import { Formik } from 'formik';
-import { useState } from "react";
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import * as Yup from 'yup';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import imageSingUp from '../images/page-singup.jpg';
 import { Form, Button } from 'react-bootstrap';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { toastify } from '../Toastify';
+import imageSingUp from '../images/page-singup.jpg';
+import toastify from '../toastify';
+import Nav from './Nav';
 
-export const SignUp = () => {
+const SignUp = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [error, setError] = useState('');
 
   const signupSchema = Yup.object().shape({
-    name: Yup.string().required().min(3, 'от 3 до 20 символов'),
-    password: Yup.string().required().min(6, 'не менее 6 символов'),
-    confirmPassword: Yup.string().oneOf([Yup.ref('password'), null], 'Пароли должны совпадать'),
+    name: Yup.string().required().min(3, t('errors.singUp.name')),
+    password: Yup.string().required().min(6, t('errors.singUp.password')),
+    confirmPassword: Yup.string().oneOf([Yup.ref('password'), null], t('errors.singUp.confirmPassword')),
   });
 
   return (
-    <div className='d-flex flex-column h-100'>
-      <nav className='shadow-sm navbar navbar-expand-lg navbar-light bg-white'>
-        <div className='container'>
-          <a className='navbar-brand' href='/'>Hexlet Chat</a>
-        </div>
-      </nav>
+    <div className="d-flex flex-column h-100">
+      <Nav button="no" />
       <div className="container-fluid h-100">
         <div className="row justify-content-center align-content-center h-100">
           <div className="col-12 col-md-8 col-xxl-6">
@@ -55,28 +54,34 @@ export const SignUp = () => {
                       navigate('/');
                     } catch (err) {
                       if (err.response.status !== 409) {
-                        toastify('Ошибка сети', 'error');
-                      } else setError('Такой пользователь уже существует');
+                        toastify(t('errors.network'), 'error');
+                      } else setError(t('errors.singUp.axios'));
                     }
                   }}
                 >
-                  {({ errors, touched, values, handleSubmit, handleChange }) => (
+                  {({
+                    errors,
+                    touched,
+                    values,
+                    handleSubmit,
+                    handleChange,
+                  }) => (
                     <Form className="col-12 col-md-6 mt-3 mt-mb-0" onSubmit={handleSubmit}>
-                      <h1 className="text-center mb-4">Войти</h1>
+                      <h1 className="text-center mb-4">{t('singUp.h1')}</h1>
                       <Form.Group className="form-floating mb-3">
                         <Form.Control
                           name="name"
                           id="name"
                           autoComplete="name"
-                          placeholder="Имя пользователя"
+                          placeholder={t('singUp.name')}
                           className="form-control"
                           value={values.name}
                           onChange={handleChange}
                           isValid={touched.name && !errors.name}
                           isInvalid={error !== '' || errors.name}
                         />
+                        <Form.Label className="form-label">{t('singUp.name')}</Form.Label>
                         <Form.Control.Feedback type="invalid">{errors.name}</Form.Control.Feedback>
-                        <label className="form-label" htmlFor="name">Имя пользователя</label>
                       </Form.Group>
 
                       <Form.Group className="form-floating mb-4">
@@ -85,15 +90,15 @@ export const SignUp = () => {
                           name="password"
                           id="password"
                           autoComplete="password"
-                          placeholder="Пароль"
+                          placeholder={t('singUp.password')}
                           className="form-control"
                           value={values.password}
                           onChange={handleChange}
                           isValid={touched.password && !errors.password}
                           isInvalid={error !== '' || errors.password}
                         />
+                        <Form.Label className="form-label">{t('singUp.password')}</Form.Label>
                         <Form.Control.Feedback type="invalid">{errors.password}</Form.Control.Feedback>
-                        <label className="form-label" htmlFor="password">Пароль</label>
                       </Form.Group>
 
                       <Form.Group className="form-floating mb-4">
@@ -102,15 +107,15 @@ export const SignUp = () => {
                           name="confirmPassword"
                           id="confirmPassword"
                           autoComplete="confirmPassword"
-                          placeholder="Подтвердите пароль"
+                          placeholder={t('singUp.confirmPassword')}
                           className="form-control"
                           value={values.confirmPassword}
                           onChange={handleChange}
                           isValid={touched.confirmPassword && !errors.confirmPassword}
                           isInvalid={error !== '' || errors.confirmPassword}
                         />
+                        <Form.Label className="form-label">{t('singUp.confirmPassword')}</Form.Label>
                         <Form.Control.Feedback type="invalid">{error !== '' ? error : errors.confirmPassword}</Form.Control.Feedback>
-                        <label className="form-label" htmlFor="password">Подтвердите пароль</label>
                       </Form.Group>
 
                       <Button
@@ -118,7 +123,7 @@ export const SignUp = () => {
                         variant="outline-primary"
                         className="w-100 mb-3"
                       >
-                        Зарегистрироваться
+                        {t('singUp.button')}
                       </Button>
                     </Form>
                   )}
@@ -131,4 +136,6 @@ export const SignUp = () => {
       <ToastContainer />
     </div>
   );
-}
+};
+
+export default SignUp;
