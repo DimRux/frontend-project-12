@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import * as Yup from 'yup';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import filter from 'leo-profanity';
 import { useSelector, useDispatch } from 'react-redux';
 import { Form, Button, Modal } from 'react-bootstrap';
 import AuthorizationContext from '../../context/AuthorizationContext';
@@ -51,7 +52,7 @@ const EditChannelModal = ({ show, handleClose }) => {
                   Authorization: `Bearer ${token}`,
                 },
               });
-              dispatch(editChannel(response.data));
+              dispatch(editChannel({ ...response.data, name: filter.clean(response.data.name) }));
               handleClose();
               toastify(t('editChannelModal.postFeedback'), 'success');
             } catch {

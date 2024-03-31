@@ -4,6 +4,7 @@ import axios from 'axios';
 import * as Yup from 'yup';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useTranslation } from 'react-i18next';
+import filter from 'leo-profanity';
 import { useSelector, useDispatch } from 'react-redux';
 import { Form, Button, Modal } from 'react-bootstrap';
 import { addChannel } from '../../slices/channelsSlice';
@@ -50,7 +51,11 @@ const AddChannelModal = ({ show, handleClose }) => {
                   Authorization: `Bearer ${token}`,
                 },
               });
-              const newChannel = { channel: response.data, activeChannelId: response.data.id };
+              const channel = { ...response.data, name: filter.clean(response.data.name) };
+              const newChannel = {
+                channel,
+                activeChannelId: response.data.id,
+              };
               dispatch(addChannel(newChannel));
               handleClose();
               toastify(t('addChannelModal.postFeedback'), 'success');

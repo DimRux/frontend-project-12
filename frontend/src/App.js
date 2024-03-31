@@ -8,6 +8,7 @@ import AuthorizationContext from './context/AuthorizationContext';
 import LogIn from './Components/LogIn.js';
 import Chat from './Components/Chat.js';
 import SignUp from './Components/SignUp.js';
+import initLeoprofanity from './leoProfanity.js';
 
 const AuthorizationProvider = ({ children }) => {
   const contextValue = useMemo(() => ({
@@ -25,6 +26,7 @@ const AuthorizationProvider = ({ children }) => {
 
 const App = () => {
   initI18next();
+  initLeoprofanity();
 
   return (
     <Provider store={store}>

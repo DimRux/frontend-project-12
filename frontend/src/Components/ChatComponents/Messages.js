@@ -1,6 +1,7 @@
 import { useEffect, useContext } from 'react';
 import axios from 'axios';
 import { useSelector, useDispatch } from 'react-redux';
+import filter from 'leo-profanity';
 import AuthorizationContext from '../../context/AuthorizationContext';
 import { addMessage, initMessages } from '../../slices/messagesSlice';
 
@@ -45,7 +46,7 @@ const Messages = () => {
       <div key={id} className="text-breack mb-2">
         <b>{username}</b>
         {': '}
-        {body}
+        {filter.clean(body)}
       </div>
     ))
   );
