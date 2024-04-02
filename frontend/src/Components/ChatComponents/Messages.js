@@ -7,7 +7,7 @@ import { addMessage, initMessages } from '../../slices/messagesSlice';
 
 const Messages = () => {
   const dispatch = useDispatch();
-  const { getToken, socket } = useContext(AuthorizationContext);
+  const { getToken, socket, socketApi } = useContext(AuthorizationContext);
   const token = getToken();
   const activeChannel = useSelector((state) => state.channels.activeChannelId);
   const allMessages = useSelector((state) => state.messages);
@@ -35,11 +35,11 @@ const Messages = () => {
   };
 
   useEffect(() => {
-    socket.on('newMessage', handleNewMessage);
+    socketApi.sendMessage(socket, 'on', handleNewMessage);
     return () => {
-      socket.off('newMessage', handleNewMessage);
+      socketApi.sendMessage(socket, 'off', handleNewMessage);
     };
-  }, [socket, allMessages]);
+  }, [allMessages]);
 
   return (
     messages.map(({ body, username, id }) => (

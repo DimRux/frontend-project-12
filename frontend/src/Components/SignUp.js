@@ -103,7 +103,7 @@ const SignUp = () => {
 
                       <Form.Group className="form-floating mb-4">
                         <Form.Control
-                          type="confirmPassword"
+                          type="password"
                           name="confirmPassword"
                           id="confirmPassword"
                           autoComplete="confirmPassword"

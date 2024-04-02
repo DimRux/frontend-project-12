@@ -32,14 +32,14 @@ const ru = {
     addChannelModal: {
       title: 'Добавить канал',
       name: 'Имя канала',
-      postFeedback: 'Канал добавлен',
+      postFeedback: 'Канал создан',
       buttonAdd: 'Отправить',
       buttonClose: 'Отменить',
     },
     editChannelModal: {
       title: 'Переименовать канал',
       name: 'Имя канала',
-      postFeedback: 'Канал изменен',
+      postFeedback: 'Канал переименован',
       buttonAdd: 'Отправить',
       buttonClose: 'Отменить',
     },
@@ -51,34 +51,34 @@ const ru = {
       buttonClose: 'Отменить',
     },
     channelUser: {
-      delEdit: 'Удалить/Переименовать',
+      delEdit: 'Управление каналом',
       del: 'Удалить',
       edit: 'Изменить',
     },
     formMessage: 'Введите сообщение...',
     errors: {
       singUp: {
-        name: 'от 3 до 20 символов',
-        password: 'не менее 6 символов',
+        name: 'От 3 до 20 символов',
+        password: 'Не менее 6 символов',
         confirmPassword: 'Пароли должны совпадать',
         axios: 'Такой пользователь уже существует',
       },
-      logIn: 'Неверное имя пользователя или пароль',
+      logIn: 'Неверные имя пользователя или пароль',
       addChannelModal: {
         name: {
           req: 'Обязательное поле',
-          minMax: 'от 3 до 20 символов',
+          minMax: 'От 3 до 20 символов',
           uniq: 'Должно быть уникальным',
         },
       },
       editChannelModal: {
         name: {
           req: 'Обязательное поле',
-          minMax: 'от 3 до 20 символов',
+          minMax: 'От 3 до 20 символов',
           uniq: 'Должно быть уникальным',
         },
       },
-      network: 'Ошибка сети',
+      network: 'Ошибка соединения',
     },
   },
 };

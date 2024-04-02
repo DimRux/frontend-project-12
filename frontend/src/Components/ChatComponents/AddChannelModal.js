@@ -1,5 +1,5 @@
 import { Formik } from 'formik';
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import axios from 'axios';
 import * as Yup from 'yup';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -15,8 +15,15 @@ const AddChannelModal = ({ show, handleClose }) => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
   const channels = useSelector((state) => state.channels.channels);
-  const { getToken } = useContext(AuthorizationContext);
+  const { getToken, socket, socketApi } = useContext(AuthorizationContext);
   const token = getToken();
+
+  useEffect(() => {
+    socketApi.createChannel(socket, 'on', (payload) => dispatch(addChannel({ ...payload, name: filter.clean(payload.name), activeChannelId: payload.id })));
+    return () => {
+      socketApi.createChannel(socket, 'off', (payload) => dispatch(addChannel({ ...payload, name: filter.clean(payload.name), activeChannelId: payload.id })));
+    };
+  }, [dispatch, socket, socketApi]);
 
   const signupSchema = Yup.object().shape({
     name: Yup.string()
@@ -57,6 +64,7 @@ const AddChannelModal = ({ show, handleClose }) => {
                 activeChannelId: response.data.id,
               };
               dispatch(addChannel(newChannel));
+
               handleClose();
               toastify(t('addChannelModal.postFeedback'), 'success');
             } catch {
