@@ -5,15 +5,13 @@ import axios from 'axios';
 import * as Yup from 'yup';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import filter from 'leo-profanity';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { Form, Button, Modal } from 'react-bootstrap';
 import AuthorizationContext from '../../context/AuthorizationContext';
-import { editChannel } from '../../slices/channelsSlice';
 import toastify from '../../toastify';
 
 const EditChannelModal = ({ show, handleClose }) => {
   const { t } = useTranslation();
-  const dispatch = useDispatch();
   const channelId = useSelector((state) => state.channels.activeChannelId);
   const channels = useSelector((state) => state.channels.channels);
   const { getToken } = useContext(AuthorizationContext);
@@ -46,13 +44,12 @@ const EditChannelModal = ({ show, handleClose }) => {
           validationSchema={signupSchema}
           onSubmit={async (values) => {
             try {
-              const { name } = values;
-              const response = await axios.patch(`/api/v1/channels/${channelId}`, { name }, {
+              const name = filter.clean(values.name);
+              await axios.patch(`/api/v1/channels/${channelId}`, { name }, {
                 headers: {
                   Authorization: `Bearer ${token}`,
                 },
               });
-              dispatch(editChannel({ ...response.data, name: filter.clean(response.data.name) }));
               handleClose();
               toastify(t('editChannelModal.postFeedback'), 'success');
             } catch {

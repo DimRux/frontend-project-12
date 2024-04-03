@@ -17,12 +17,10 @@ const channelsSlice = createSlice({
       const { activeChannelId } = payload;
       return { ...state, activeChannelId };
     },
-    addChannel: (state, { payload }) => {
-      const { channel, activeChannelId } = payload;
-      return { ...state, channels: [...state.channels, channel], activeChannelId };
-    },
+    addChannel: (state, { payload }) => (
+      { ...state, channels: [...state.channels, payload.payload] }),
     editChannel: (state, { payload }) => {
-      const { name, id } = payload;
+      const { name, id } = payload.payload;
       const channel = state.channels.find(
         (channelItem) => channelItem.id === id,
       );

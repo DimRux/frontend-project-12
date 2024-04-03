@@ -1,5 +1,5 @@
 import { Formik } from 'formik';
-import { useContext, useEffect } from 'react';
+import { useContext } from 'react';
 import axios from 'axios';
 import * as Yup from 'yup';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -7,23 +7,16 @@ import { useTranslation } from 'react-i18next';
 import filter from 'leo-profanity';
 import { useSelector, useDispatch } from 'react-redux';
 import { Form, Button, Modal } from 'react-bootstrap';
-import { addChannel } from '../../slices/channelsSlice';
 import AuthorizationContext from '../../context/AuthorizationContext';
 import toastify from '../../toastify';
+import { changeChannelId } from '../../slices/channelsSlice';
 
 const AddChannelModal = ({ show, handleClose }) => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
   const channels = useSelector((state) => state.channels.channels);
-  const { getToken, socket, socketApi } = useContext(AuthorizationContext);
+  const { getToken } = useContext(AuthorizationContext);
   const token = getToken();
-
-  useEffect(() => {
-    socketApi.createChannel(socket, 'on', (payload) => dispatch(addChannel({ ...payload, name: filter.clean(payload.name), activeChannelId: payload.id })));
-    return () => {
-      socketApi.createChannel(socket, 'off', (payload) => dispatch(addChannel({ ...payload, name: filter.clean(payload.name), activeChannelId: payload.id })));
-    };
-  }, [dispatch, socket, socketApi]);
 
   const signupSchema = Yup.object().shape({
     name: Yup.string()
@@ -52,19 +45,14 @@ const AddChannelModal = ({ show, handleClose }) => {
           validationSchema={signupSchema}
           onSubmit={async (values) => {
             try {
-              const { name } = values;
+              const name = filter.clean(values.name);
               const response = await axios.post('/api/v1/channels', { name }, {
                 headers: {
                   Authorization: `Bearer ${token}`,
                 },
               });
-              const channel = { ...response.data, name: filter.clean(response.data.name) };
-              const newChannel = {
-                channel,
-                activeChannelId: response.data.id,
-              };
-              dispatch(addChannel(newChannel));
-
+              const { id } = response.data;
+              dispatch(changeChannelId({ activeChannelId: id }));
               handleClose();
               toastify(t('addChannelModal.postFeedback'), 'success');
             } catch {

@@ -3,11 +3,11 @@ import axios from 'axios';
 import { useSelector, useDispatch } from 'react-redux';
 import filter from 'leo-profanity';
 import AuthorizationContext from '../../context/AuthorizationContext';
-import { addMessage, initMessages } from '../../slices/messagesSlice';
+import { initMessages } from '../../slices/messagesSlice';
 
 const Messages = () => {
   const dispatch = useDispatch();
-  const { getToken, socket, socketApi } = useContext(AuthorizationContext);
+  const { getToken } = useContext(AuthorizationContext);
   const token = getToken();
   const activeChannel = useSelector((state) => state.channels.activeChannelId);
   const allMessages = useSelector((state) => state.messages);
@@ -26,20 +26,6 @@ const Messages = () => {
       requestData();
     }
   }, []);
-
-  const handleNewMessage = (message) => {
-    const existingMessage = allMessages.messages.find((m) => m.id === message.id);
-    if (!existingMessage) {
-      dispatch(addMessage(message));
-    }
-  };
-
-  useEffect(() => {
-    socketApi.sendMessage(socket, 'on', handleNewMessage);
-    return () => {
-      socketApi.sendMessage(socket, 'off', handleNewMessage);
-    };
-  }, [allMessages]);
 
   return (
     messages.map(({ body, username, id }) => (

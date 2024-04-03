@@ -1,5 +1,4 @@
 import { Provider as RollbarProvider, ErrorBoundary } from '@rollbar/react';
-import { io } from 'socket.io-client';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { useMemo } from 'react';
@@ -13,15 +12,9 @@ import initLeoprofanity from './leoProfanity.js';
 
 const AuthorizationProvider = ({ children }) => {
   const contextValue = useMemo(() => ({
-    socket: io(),
+    socket: null,
     getUsername: () => (localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).username : null),
     getToken: () => (localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).token : null),
-    socketApi: {
-      sendMessage: (socket, key, fn) => socket[key]('newMessage', fn),
-      createChannel: (socket, key, fn) => socket[key]('newChannel', fn),
-      renameChannel: (socket, key, fn) => socket[key]('renameChannel', fn),
-      removeChannel: (socket, key, fn) => socket[key]('removeChannel', fn),
-    },
   }), []);
 
   return (
@@ -39,7 +32,6 @@ const rollbarConfig = {
 const App = () => {
   initI18next();
   initLeoprofanity();
-  io();
 
   return (
     <RollbarProvider config={rollbarConfig}>
