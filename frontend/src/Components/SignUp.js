@@ -90,7 +90,7 @@ const SignUp = () => {
                       <Form.Group className="form-floating mb-4">
                         <Form.Control
                           type="password"
-                          username="password"
+                          name="password"
                           id="password"
                           autoComplete="password"
                           placeholder={t('singUp.password')}
@@ -107,7 +107,7 @@ const SignUp = () => {
                       <Form.Group className="form-floating mb-4">
                         <Form.Control
                           type="password"
-                          username="confirmPassword"
+                          name="confirmPassword"
                           id="confirmPassword"
                           autoComplete="confirmPassword"
                           placeholder={t('singUp.confirmPassword')}

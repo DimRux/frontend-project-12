@@ -58,7 +58,7 @@ const ru = {
     formMessage: 'Введите сообщение...',
     errors: {
       singUp: {
-        name: 'От 3 до 20 символов',
+        username: 'От 3 до 20 символов',
         password: 'Не менее 6 символов',
         confirmPassword: 'Пароли должны совпадать',
         axios: 'Такой пользователь уже существует',
