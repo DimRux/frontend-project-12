@@ -56,6 +56,7 @@ const SignUp = () => {
                       navigate('/');
                       setDisabled(false);
                     } catch (err) {
+                      setDisabled(false);
                       if (err.response.status !== 409) {
                         toastify(t('errors.network'), 'error');
                       } else setError(t('errors.singUp.axios'));

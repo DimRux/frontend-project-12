@@ -13,9 +13,10 @@ const LogIn = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [error, setError] = useState('');
+  const [isDisabled, setDisabled] = useState(false);
 
   const signupSchema = Yup.object().shape({
-    name: Yup.string().required(),
+    username: Yup.string().required(),
     password: Yup.string().required(),
   });
 
@@ -36,19 +37,22 @@ const LogIn = () => {
                 </div>
                 <Formik
                   initialValues={{
-                    name: '',
+                    username: '',
                     password: '',
                   }}
                   validationSchema={signupSchema}
                   onSubmit={async (values) => {
                     try {
-                      const { name, password } = values;
-                      const response = await axios.post('/api/v1/login', { username: name, password });
+                      setDisabled(true);
+                      const { username, password } = values;
+                      const response = await axios.post('/api/v1/login', { username, password });
                       localStorage.setItem('user', JSON.stringify(response.data));
                       setError('');
                       navigate('/');
+                      setDisabled(false);
                     } catch (e) {
                       setError(t('errors.singUp.confirmPassword'));
+                      setDisabled(false);
                     }
                   }}
                 >
@@ -63,17 +67,17 @@ const LogIn = () => {
                       <h1 className="text-center mb-4">{t('logIn.h1')}</h1>
                       <Form.Group className="form-floating mb-3">
                         <Form.Control
-                          name="name"
-                          id="name"
-                          autoComplete="name"
+                          name="username"
+                          id="username"
+                          autoComplete="username"
                           placeholder={t('logIn.name')}
                           className="form-control"
-                          value={values.name}
+                          value={values.username}
                           onChange={handleChange}
-                          isValid={touched.name && !errors.name}
+                          isValid={touched.username && !errors.username}
                           isInvalid={error !== ''}
                         />
-                        <Form.Label className="form-label">{t('logIn.name')}</Form.Label>
+                        <Form.Label htmlFor="username">{t('logIn.name')}</Form.Label>
                       </Form.Group>
 
                       <Form.Group className="form-floating mb-4">
@@ -89,13 +93,14 @@ const LogIn = () => {
                           isValid={touched.password && !errors.password}
                           isInvalid={error !== ''}
                         />
-                        <Form.Label className="form-label">{t('logIn.password')}</Form.Label>
+                        <Form.Label htmlFor="password">{t('logIn.password')}</Form.Label>
                         {error && <Form.Control.Feedback type="invalid">{t('errors.logIn')}</Form.Control.Feedback>}
                       </Form.Group>
                       <Button
                         type="submit"
                         variant="outline-primary"
                         className="w-100 mb-3"
+                        disabled={isDisabled}
                       >
                         {t('logIn.button')}
                       </Button>
