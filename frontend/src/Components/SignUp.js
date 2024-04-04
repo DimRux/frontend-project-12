@@ -16,6 +16,7 @@ const SignUp = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [error, setError] = useState('');
+  const [isDisabled, setDisabled] = useState(false);
 
   const signupSchema = Yup.object().shape({
     username: Yup.string().required().min(3, t('errors.singUp.username')),
@@ -47,11 +48,13 @@ const SignUp = () => {
                   validationSchema={signupSchema}
                   onSubmit={async (values) => {
                     try {
+                      setDisabled(true);
                       const { username, password } = values;
                       const response = await axios.post('/api/v1/signup', { username, password });
                       localStorage.setItem('user', JSON.stringify(response.data));
                       setError('');
                       navigate('/');
+                      setDisabled(false);
                     } catch (err) {
                       if (err.response.status !== 409) {
                         toastify(t('errors.network'), 'error');
@@ -122,6 +125,7 @@ const SignUp = () => {
                         type="submit"
                         variant="outline-primary"
                         className="w-100 mb-3"
+                        disabled={isDisabled}
                       >
                         {t('singUp.button')}
                       </Button>
