@@ -6,7 +6,7 @@ const ru = {
     },
     singUp: {
       h1: 'Регистрация',
-      name: 'Имя пользователя',
+      username: 'Имя пользователя',
       password: 'Пароль',
       confirmPassword: 'Подтвердите пароль',
       button: 'Зарегистрироваться',

@@ -18,7 +18,7 @@ const SignUp = () => {
   const [error, setError] = useState('');
 
   const signupSchema = Yup.object().shape({
-    name: Yup.string().required().min(3, t('errors.singUp.name')),
+    username: Yup.string().required().min(3, t('errors.singUp.username')),
     password: Yup.string().required().min(6, t('errors.singUp.password')),
     confirmPassword: Yup.string().oneOf([Yup.ref('password'), null], t('errors.singUp.confirmPassword')),
   });
@@ -40,15 +40,15 @@ const SignUp = () => {
                 </div>
                 <Formik
                   initialValues={{
-                    name: '',
+                    username: '',
                     password: '',
                     confirmPassword: '',
                   }}
                   validationSchema={signupSchema}
                   onSubmit={async (values) => {
                     try {
-                      const { name, password } = values;
-                      const response = await axios.post('/api/v1/signup', { username: name, password });
+                      const { username, password } = values;
+                      const response = await axios.post('/api/v1/signup', { username, password });
                       localStorage.setItem('user', JSON.stringify(response.data));
                       setError('');
                       navigate('/');
@@ -70,24 +70,24 @@ const SignUp = () => {
                       <h1 className="text-center mb-4">{t('singUp.h1')}</h1>
                       <Form.Group className="form-floating mb-3">
                         <Form.Control
-                          name="name"
-                          id="name"
-                          autoComplete="name"
-                          placeholder={t('singUp.name')}
+                          username="username"
+                          id="username"
+                          autoComplete="username"
+                          placeholder={t('singUp.username')}
                           className="form-control"
-                          value={values.name}
+                          value={values.username}
                           onChange={handleChange}
-                          isValid={touched.name && !errors.name}
-                          isInvalid={error !== '' || errors.name}
+                          isValid={touched.username && !errors.username}
+                          isInvalid={error !== '' || (errors.username && touched.username)}
                         />
-                        <Form.Label className="form-label">{t('singUp.name')}</Form.Label>
-                        <Form.Control.Feedback type="invalid">{errors.name}</Form.Control.Feedback>
+                        <Form.Label className="form-label">{t('singUp.username')}</Form.Label>
+                        <Form.Control.Feedback type="invalid">{errors.username}</Form.Control.Feedback>
                       </Form.Group>
 
                       <Form.Group className="form-floating mb-4">
                         <Form.Control
                           type="password"
-                          name="password"
+                          username="password"
                           id="password"
                           autoComplete="password"
                           placeholder={t('singUp.password')}
@@ -95,7 +95,7 @@ const SignUp = () => {
                           value={values.password}
                           onChange={handleChange}
                           isValid={touched.password && !errors.password}
-                          isInvalid={error !== '' || errors.password}
+                          isInvalid={error !== '' || (touched.password && errors.password)}
                         />
                         <Form.Label className="form-label">{t('singUp.password')}</Form.Label>
                         <Form.Control.Feedback type="invalid">{errors.password}</Form.Control.Feedback>
@@ -104,7 +104,7 @@ const SignUp = () => {
                       <Form.Group className="form-floating mb-4">
                         <Form.Control
                           type="password"
-                          name="confirmPassword"
+                          username="confirmPassword"
                           id="confirmPassword"
                           autoComplete="confirmPassword"
                           placeholder={t('singUp.confirmPassword')}
