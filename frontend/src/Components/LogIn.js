@@ -90,7 +90,7 @@ const LogIn = () => {
                           isInvalid={error !== ''}
                         />
                         <Form.Label className="form-label">{t('logIn.password')}</Form.Label>
-                        {error && <Form.Control.Feedback type="invalid">{error}</Form.Control.Feedback>}
+                        {error && <Form.Control.Feedback type="invalid">{t('errors.logIn')}</Form.Control.Feedback>}
                       </Form.Group>
                       <Button
                         type="submit"
