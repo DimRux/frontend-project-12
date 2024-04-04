@@ -83,7 +83,7 @@ const SignUp = () => {
                           isValid={touched.username && !errors.username}
                           isInvalid={error !== '' || (errors.username && touched.username)}
                         />
-                        <Form.Label className="form-label">{t('singUp.username')}</Form.Label>
+                        <Form.Label htmlFor="username">{t('singUp.username')}</Form.Label>
                         <Form.Control.Feedback type="invalid">{errors.username}</Form.Control.Feedback>
                       </Form.Group>
 
@@ -100,7 +100,7 @@ const SignUp = () => {
                           isValid={touched.password && !errors.password}
                           isInvalid={error !== '' || (touched.password && errors.password)}
                         />
-                        <Form.Label className="form-label">{t('singUp.password')}</Form.Label>
+                        <Form.Label htmlFor="password">{t('singUp.password')}</Form.Label>
                         <Form.Control.Feedback type="invalid">{errors.password}</Form.Control.Feedback>
                       </Form.Group>
 
@@ -117,7 +117,7 @@ const SignUp = () => {
                           isValid={touched.confirmPassword && !errors.confirmPassword}
                           isInvalid={error !== '' || errors.confirmPassword}
                         />
-                        <Form.Label className="form-label">{t('singUp.confirmPassword')}</Form.Label>
+                        <Form.Label htmlFor="confirmPassword">{t('singUp.confirmPassword')}</Form.Label>
                         <Form.Control.Feedback type="invalid">{error !== '' ? error : errors.confirmPassword}</Form.Control.Feedback>
                       </Form.Group>
 
