@@ -70,7 +70,7 @@ const SignUp = () => {
                       <h1 className="text-center mb-4">{t('singUp.h1')}</h1>
                       <Form.Group className="form-floating mb-3">
                         <Form.Control
-                          username="username"
+                          name="username"
                           id="username"
                           autoComplete="username"
                           placeholder={t('singUp.username')}
