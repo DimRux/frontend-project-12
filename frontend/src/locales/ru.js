@@ -53,7 +53,7 @@ const ru = {
     channelUser: {
       delEdit: 'Управление каналом',
       del: 'Удалить',
-      edit: 'Изменить',
+      edit: 'Переименовать',
     },
     formMessage: 'Введите сообщение...',
     errors: {
