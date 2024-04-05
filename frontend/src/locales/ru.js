@@ -45,7 +45,7 @@ const ru = {
     },
     removeChannelModal: {
       title: 'Удалить канал',
-      postFeedback: 'Канал удален',
+      postFeedback: 'Канал удалён',
       p: 'Уверены?',
       buttonAdd: 'Удалить',
       buttonClose: 'Отменить',
