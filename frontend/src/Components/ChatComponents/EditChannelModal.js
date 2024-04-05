@@ -78,7 +78,7 @@ const EditChannelModal = ({ show, handleClose }) => {
                   onChange={handleChange}
                   isInvalid={errors.name}
                 />
-                <Form.Label className="visually-hidden">{t('editChannelModal.name')}</Form.Label>
+                <Form.Label className="visually-hidden" htmlFor="name">{t('editChannelModal.name')}</Form.Label>
                 {errors.name ? (
                   <Form.Control.Feedback type="invalid">
                     {errors.name}
