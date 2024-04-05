@@ -14,6 +14,7 @@ const EditChannelModal = ({ show, handleClose }) => {
   const { t } = useTranslation();
   const channelId = useSelector((state) => state.channels.activeChannelId);
   const channels = useSelector((state) => state.channels.channels);
+  const currentChannel = channels.filter(({ id }) => id === channelId);
   const { getToken } = useContext(AuthorizationContext);
   const [isDisabled, setDisabled] = useState(false);
   const token = getToken();
@@ -41,7 +42,7 @@ const EditChannelModal = ({ show, handleClose }) => {
       </Modal.Header>
       <Modal.Body>
         <Formik
-          initialValues={{ name: '' }}
+          initialValues={{ name: `${currentChannel[0].name}` }}
           validationSchema={signupSchema}
           onSubmit={async (values) => {
             try {
