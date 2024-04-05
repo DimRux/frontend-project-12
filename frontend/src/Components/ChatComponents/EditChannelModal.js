@@ -73,6 +73,7 @@ const EditChannelModal = ({ show, handleClose }) => {
                 <Form.Control
                   type="text"
                   name="name"
+                  id="name"
                   className="mb-2"
                   autoFocus="true"
                   value={values.name}
