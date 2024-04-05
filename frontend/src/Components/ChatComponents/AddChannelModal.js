@@ -1,5 +1,5 @@
 import { Formik } from 'formik';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import axios from 'axios';
 import * as Yup from 'yup';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -16,6 +16,7 @@ const AddChannelModal = ({ show, handleClose }) => {
   const dispatch = useDispatch();
   const channels = useSelector((state) => state.channels.channels);
   const { getToken } = useContext(AuthorizationContext);
+  const [isDisabled, setDisabled] = useState(false);
   const token = getToken();
 
   const signupSchema = Yup.object().shape({
@@ -45,6 +46,7 @@ const AddChannelModal = ({ show, handleClose }) => {
           validationSchema={signupSchema}
           onSubmit={async (values) => {
             try {
+              setDisabled(true);
               const name = filter.clean(values.name);
               const response = await axios.post('/api/v1/channels', { name }, {
                 headers: {
@@ -55,8 +57,10 @@ const AddChannelModal = ({ show, handleClose }) => {
               dispatch(changeChannelId({ activeChannelId: id }));
               handleClose();
               toastify(t('addChannelModal.postFeedback'), 'success');
+              setDisabled(false);
             } catch {
               toastify(t('errors.network'), 'error');
+              setDisabled(false);
             }
           }}
         >
@@ -78,7 +82,7 @@ const AddChannelModal = ({ show, handleClose }) => {
                   isInvalid={errors.name}
                   id="name"
                 />
-                <Form.Label className="visually-hidden">{t('addChannelModal.name')}</Form.Label>
+                <Form.Label className="visually-hidden" htmlFor="name">{t('addChannelModal.name')}</Form.Label>
                 {errors.name ? (
                   <Form.Control.Feedback type="invalid">
                     {errors.name}
@@ -97,6 +101,7 @@ const AddChannelModal = ({ show, handleClose }) => {
                 <Button
                   variant="primary"
                   type="submit"
+                  disabled={isDisabled}
                 >
                   {t('addChannelModal.buttonAdd')}
                 </Button>

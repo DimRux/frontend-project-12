@@ -1,5 +1,5 @@
 import { Formik } from 'formik';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import * as Yup from 'yup';
@@ -15,6 +15,7 @@ const EditChannelModal = ({ show, handleClose }) => {
   const channelId = useSelector((state) => state.channels.activeChannelId);
   const channels = useSelector((state) => state.channels.channels);
   const { getToken } = useContext(AuthorizationContext);
+  const [isDisabled, setDisabled] = useState(false);
   const token = getToken();
 
   const signupSchema = Yup.object().shape({
@@ -44,6 +45,7 @@ const EditChannelModal = ({ show, handleClose }) => {
           validationSchema={signupSchema}
           onSubmit={async (values) => {
             try {
+              setDisabled(true);
               const name = filter.clean(values.name);
               await axios.patch(`/api/v1/channels/${channelId}`, { name }, {
                 headers: {
@@ -52,8 +54,10 @@ const EditChannelModal = ({ show, handleClose }) => {
               });
               handleClose();
               toastify(t('editChannelModal.postFeedback'), 'success');
+              setDisabled(false);
             } catch {
               toastify(t('errors.network'), 'error');
+              setDisabled(false);
             }
           }}
         >
@@ -93,6 +97,7 @@ const EditChannelModal = ({ show, handleClose }) => {
                 <Button
                   variant="primary"
                   type="submit"
+                  disabled={isDisabled}
                 >
                   {t('editChannelModal.buttonAdd')}
                 </Button>

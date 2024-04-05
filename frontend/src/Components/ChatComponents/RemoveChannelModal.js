@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -13,10 +13,12 @@ const RemoveChannelModal = ({ show, handleClose }) => {
   const dispatch = useDispatch();
   const channelId = useSelector((state) => state.channels.activeChannelId);
   const { getToken } = useContext(AuthorizationContext);
+  const [isDisabled, setDisabled] = useState(false);
   const token = getToken();
 
   const handleRemove = async () => {
     try {
+      setDisabled(true);
       const response = await axios.delete(`/api/v1/channels/${channelId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -25,8 +27,10 @@ const RemoveChannelModal = ({ show, handleClose }) => {
       dispatch(removeChannel(response.data));
       handleClose();
       toastify(t('removeChannelModal.postFeedback'), 'success');
+      setDisabled(false);
     } catch {
       toastify(t('errors.network'), 'error');
+      setDisabled(false);
     }
   };
 
@@ -59,6 +63,7 @@ const RemoveChannelModal = ({ show, handleClose }) => {
             variant="danger"
             type="button"
             onClick={handleRemove}
+            disabled={isDisabled}
           >
             {t('removeChannelModal.buttonAdd')}
           </Button>

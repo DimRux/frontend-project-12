@@ -1,5 +1,5 @@
 import { useFormik } from 'formik';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import axios from 'axios';
 import { ArrowRightSquare } from 'react-bootstrap-icons';
 import { useSelector } from 'react-redux';
@@ -12,16 +12,23 @@ const FormMessage = () => {
   const { t } = useTranslation();
   const { getToken, getUsername } = useContext(AuthorizationContext);
   const channelId = useSelector((state) => state.channels.activeChannelId);
+  const [isDisabled, setDisabled] = useState(false);
 
   const formik = useFormik({
     initialValues: { body: '' },
     onSubmit: async ({ body }) => {
-      const newMessage = { body, channelId, username: getUsername() };
-      await axios.post('/api/v1/messages', newMessage, {
-        headers: {
-          Authorization: `Bearer ${getToken()}`,
-        },
-      });
+      try {
+        setDisabled(true);
+        const newMessage = { body, channelId, username: getUsername() };
+        await axios.post('/api/v1/messages', newMessage, {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        });
+        setDisabled(false);
+      } catch {
+        setDisabled(false);
+      }
     },
   });
 
@@ -33,11 +40,11 @@ const FormMessage = () => {
           onChange={formik.handleChange}
           value={formik.values.body}
           placeholder={t('formMessage')}
-          aria-label="Введите сообщение"
+          aria-label="Новое сообщение"
         />
-        <Button variant="group-vertical" type="submit">
+        <Button variant="group-vertical" type="submit" disabled={isDisabled}>
           <ArrowRightSquare size={20} />
-          <span className="visually-hidden" />
+          <span className="visually-hidden">Отправить</span>
         </Button>
       </InputGroup>
     </Form>
