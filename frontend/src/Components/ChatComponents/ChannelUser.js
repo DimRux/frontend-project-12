@@ -29,7 +29,7 @@ const ChanelUser = ({
       <Dropdown as={ButtonGroup} className="d-flex" onClick={changeChannel}>
         <Button
           type="button"
-          className="w-100 rounded-0 text-start text-truncate btn"
+          className="w-100 rounded-0 text-start text-truncate"
           variant={id === channelId ? 'secondary' : null}
         >
           <span className="me-1">#</span>

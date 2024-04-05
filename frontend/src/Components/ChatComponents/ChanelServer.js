@@ -14,7 +14,7 @@ const ChanelServer = ({ name, id }) => {
       <Button
         onClick={changeChannel}
         type="button"
-        className="w-100 rounded-0 text-start btn"
+        className="w-100 rounded-0 text-start"
         variant={id === channelId ? 'secondary' : null}
       >
         <span className="me-1">#</span>
