@@ -1,20 +1,20 @@
 import { Formik } from 'formik';
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import * as Yup from 'yup';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import { Form, Button } from 'react-bootstrap';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import imageSingUp from '../images/page-singup.jpg';
 import toastify from '../toastify';
 import Nav from './Nav';
+import AuthorizationContext from '../context/AuthorizationContext';
+import routes from '../routes';
 
 const SignUp = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { setToken } = useContext(AuthorizationContext);
   const [error, setError] = useState('');
   const [isDisabled, setDisabled] = useState(false);
 
@@ -36,7 +36,7 @@ const SignUp = () => {
                   <img
                     src={imageSingUp}
                     className="rounded-circle"
-                    alt="Зарегистрироваться"
+                    alt={t('singUp.imgAlt')}
                   />
                 </div>
                 <Formik
@@ -51,16 +51,15 @@ const SignUp = () => {
                       setDisabled(true);
                       const { username, password } = values;
                       const response = await axios.post('/api/v1/signup', { username, password });
-                      localStorage.setItem('user', JSON.stringify(response.data));
+                      setToken(response.data);
                       setError('');
-                      navigate('/');
-                      setDisabled(false);
+                      navigate(routes.chatPagePath);
                     } catch (err) {
-                      setDisabled(false);
-                      if (err.response.status !== 409) {
+                      if (!err.response) {
                         toastify(t('errors.network'), 'error');
-                      } else setError(t('errors.singUp.axios'));
+                      } else setError(t('errors.singUp.axios'), 'error');
                     }
+                    setDisabled(false);
                   }}
                 >
                   {({
@@ -138,7 +137,6 @@ const SignUp = () => {
           </div>
         </div>
       </div>
-      <ToastContainer />
     </div>
   );
 };

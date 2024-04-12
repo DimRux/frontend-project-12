@@ -13,7 +13,7 @@ const initSocket = () => {
   });
 
   socket.on('newChannel', (payload) => {
-    dispatch(addChannel(addChannel(payload)));
+    dispatch(addChannel(payload));
   });
 
   socket.on('removeChannel', (payload) => {
@@ -21,7 +21,7 @@ const initSocket = () => {
   });
 
   socket.on('renameChannel', (payload) => {
-    dispatch(editChannel(addChannel({ ...payload, activeChannelId: payload.id })));
+    dispatch(editChannel({ ...payload, activeChannelId: payload.id }));
   });
 
   return socket;

@@ -10,12 +10,14 @@ const ru = {
       password: 'Пароль',
       confirmPassword: 'Подтвердите пароль',
       button: 'Зарегистрироваться',
+      imgAlt: 'Зарегистрироваться',
     },
     logIn: {
       h1: 'Войти',
       name: 'Ваш ник',
       password: 'Пароль',
       button: 'Войти',
+      imgAlt: 'Войти',
       footer: {
         span: 'Нет аккаунта? ',
         a: 'Регистрация',
@@ -55,7 +57,11 @@ const ru = {
       del: 'Удалить',
       edit: 'Переименовать',
     },
-    formMessage: 'Введите сообщение...',
+    formMessage: {
+      input: 'Введите сообщение...',
+      message: 'Новое сообщение',
+      button: 'Отправить',
+    },
     errors: {
       singUp: {
         username: 'От 3 до 20 символов',

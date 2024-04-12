@@ -1,14 +1,14 @@
-import 'bootstrap/dist/css/bootstrap.min.css';
 import { useSelector, useDispatch } from 'react-redux';
 import { Button, ButtonGroup, Dropdown } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 import { changeChannelId } from '../../slices/channelsSlice';
 
-const ChanelUser = ({
+const Channels = ({
   name,
   id,
   handleShow,
   setModalVariant,
+  removable,
 }) => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
@@ -23,6 +23,22 @@ const ChanelUser = ({
     setModalVariant('removeChannel');
     handleShow();
   };
+
+  if (!removable) {
+    return (
+      <li className="nav-item w-100">
+        <Button
+          onClick={changeChannel}
+          type="button"
+          className="w-100 rounded-0 text-start"
+          variant={id === channelId ? 'secondary' : null}
+        >
+          <span className="me-1">#</span>
+          {name}
+        </Button>
+      </li>
+    );
+  }
 
   return (
     <li className="nav-item w-100">
@@ -60,4 +76,4 @@ const ChanelUser = ({
   );
 };
 
-export default ChanelUser;
+export default Channels;

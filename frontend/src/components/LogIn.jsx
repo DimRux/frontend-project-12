@@ -1,17 +1,19 @@
 import { Formik } from 'formik';
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import * as Yup from 'yup';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import { Form, Button } from 'react-bootstrap';
+import AuthorizationContext from '../context/AuthorizationContext';
 import Nav from './Nav';
+import routes from '../routes';
 import imageLogin from '../images/page-login1.jpg';
 
 const LogIn = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { setToken } = useContext(AuthorizationContext);
   const [error, setError] = useState('');
   const [isDisabled, setDisabled] = useState(false);
 
@@ -32,7 +34,7 @@ const LogIn = () => {
                   <img
                     src={imageLogin}
                     className="rounded-circle"
-                    alt="Войти"
+                    alt={t('logIn.imgAlt')}
                   />
                 </div>
                 <Formik
@@ -46,14 +48,13 @@ const LogIn = () => {
                       setDisabled(true);
                       const { username, password } = values;
                       const response = await axios.post('/api/v1/login', { username, password });
-                      localStorage.setItem('user', JSON.stringify(response.data));
+                      setToken(response.data);
                       setError('');
-                      navigate('/');
-                      setDisabled(false);
+                      navigate(routes.chatPagePath);
                     } catch (e) {
                       setError(t('errors.singUp.confirmPassword'));
-                      setDisabled(false);
                     }
+                    setDisabled(false);
                   }}
                 >
                   {({
@@ -111,7 +112,7 @@ const LogIn = () => {
               <div className="card-footer p-4">
                 <div className="text-center">
                   <span>{t('logIn.footer.span')}</span>
-                  <a href="/signup">{t('logIn.footer.a')}</a>
+                  <a href={routes.signUpPagePath}>{t('logIn.footer.a')}</a>
                 </div>
               </div>
             </div>

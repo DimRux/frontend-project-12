@@ -1,5 +1,4 @@
 import { toast, Bounce } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 
 const toastify = (message, variant) => toast[variant](`${message}`, {
   position: 'top-right',

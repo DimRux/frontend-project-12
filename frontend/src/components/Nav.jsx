@@ -1,15 +1,18 @@
-import { useTranslation } from 'react-i18next';
+import { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Button } from 'react-bootstrap';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import AuthorizationContext from '../context/AuthorizationContext';
+import routes from '../routes';
 
 const Nav = ({ button }) => {
-  const { t } = useTranslation();
   const navigate = useNavigate();
+  const { t } = useTranslation();
+  const { removeToken } = useContext(AuthorizationContext);
 
   const logOut = () => {
-    localStorage.removeItem('user');
-    navigate('/login');
+    removeToken();
+    navigate(routes.loginPagePath);
   };
 
   return (

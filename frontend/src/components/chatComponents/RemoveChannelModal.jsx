@@ -1,7 +1,6 @@
 import { useContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import { useSelector, useDispatch } from 'react-redux';
 import { Button, Modal } from 'react-bootstrap';
 import AuthorizationContext from '../../context/AuthorizationContext';
@@ -27,11 +26,10 @@ const RemoveChannelModal = ({ show, handleClose }) => {
       dispatch(removeChannel(response.data));
       handleClose();
       toastify(t('removeChannelModal.postFeedback'), 'success');
-      setDisabled(false);
     } catch {
       toastify(t('errors.network'), 'error');
-      setDisabled(false);
     }
+    setDisabled(false);
   };
 
   return (

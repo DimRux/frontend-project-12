@@ -1,20 +1,19 @@
 import { Formik } from 'formik';
 import { useContext, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import * as Yup from 'yup';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import filter from 'leo-profanity';
-import { useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
+import filterText from 'leo-profanity';
+import { useSelector, useDispatch } from 'react-redux';
 import { Form, Button, Modal } from 'react-bootstrap';
 import AuthorizationContext from '../../context/AuthorizationContext';
 import toastify from '../../toastify';
+import { changeChannelId } from '../../slices/channelsSlice';
 
-const EditChannelModal = ({ show, handleClose }) => {
+const AddChannelModal = ({ show, handleClose }) => {
   const { t } = useTranslation();
-  const channelId = useSelector((state) => state.channels.activeChannelId);
+  const dispatch = useDispatch();
   const channels = useSelector((state) => state.channels.channels);
-  const currentChannel = channels.filter(({ id }) => id === channelId);
   const { getToken } = useContext(AuthorizationContext);
   const [isDisabled, setDisabled] = useState(false);
   const token = getToken();
@@ -22,16 +21,16 @@ const EditChannelModal = ({ show, handleClose }) => {
   const signupSchema = Yup.object().shape({
     name: Yup.string()
       .trim()
-      .required(t('errors.editChannelModal.name.req'))
-      .min(3, t('errors.editChannelModal.name.minMax'))
-      .max(20, t('errors.editChannelModal.name.minMax'))
-      .notOneOf(channels.map(({ name }) => name), t('errors.editChannelModal.name.uniq')),
+      .required(t('errors.addChannelModal.name.req'))
+      .min(3, t('errors.addChannelModal.name.minMax'))
+      .max(20, t('errors.addChannelModal.name.minMax'))
+      .notOneOf(channels.map(({ name }) => name), t('errors.addChannelModal.name.uniq')),
   });
 
   return (
     <Modal show={show} onHide={handleClose}>
       <Modal.Header>
-        <Modal.Title>{t('editChannelModal.title')}</Modal.Title>
+        <Modal.Title>{t('addChannelModal.title')}</Modal.Title>
         <Button
           variant="close"
           type="button"
@@ -42,24 +41,25 @@ const EditChannelModal = ({ show, handleClose }) => {
       </Modal.Header>
       <Modal.Body>
         <Formik
-          initialValues={{ name: `${currentChannel[0].name}` }}
+          initialValues={{ name: '' }}
           validationSchema={signupSchema}
           onSubmit={async (values) => {
             try {
               setDisabled(true);
-              const name = filter.clean(values.name);
-              await axios.patch(`/api/v1/channels/${channelId}`, { name }, {
+              const name = filterText.clean(values.name);
+              const response = await axios.post('/api/v1/channels', { name }, {
                 headers: {
                   Authorization: `Bearer ${token}`,
                 },
               });
+              const { id } = response.data;
+              dispatch(changeChannelId({ activeChannelId: id }));
               handleClose();
-              toastify(t('editChannelModal.postFeedback'), 'success');
-              setDisabled(false);
+              toastify(t('addChannelModal.postFeedback'), 'success');
             } catch {
               toastify(t('errors.network'), 'error');
-              setDisabled(false);
             }
+            setDisabled(false);
           }}
         >
           {({
@@ -73,14 +73,14 @@ const EditChannelModal = ({ show, handleClose }) => {
                 <Form.Control
                   type="text"
                   name="name"
-                  id="name"
                   className="mb-2"
                   autoFocus="true"
                   value={values.name}
                   onChange={handleChange}
                   isInvalid={errors.name}
+                  id="name"
                 />
-                <Form.Label className="visually-hidden" htmlFor="name">{t('editChannelModal.name')}</Form.Label>
+                <Form.Label className="visually-hidden" htmlFor="name">{t('addChannelModal.name')}</Form.Label>
                 {errors.name ? (
                   <Form.Control.Feedback type="invalid">
                     {errors.name}
@@ -94,14 +94,14 @@ const EditChannelModal = ({ show, handleClose }) => {
                   type="button"
                   onClick={handleClose}
                 >
-                  {t('editChannelModal.buttonClose')}
+                  {t('addChannelModal.buttonClose')}
                 </Button>
                 <Button
                   variant="primary"
                   type="submit"
                   disabled={isDisabled}
                 >
-                  {t('editChannelModal.buttonAdd')}
+                  {t('addChannelModal.buttonAdd')}
                 </Button>
               </div>
             </Form>
@@ -112,4 +112,4 @@ const EditChannelModal = ({ show, handleClose }) => {
   );
 };
 
-export default EditChannelModal;
+export default AddChannelModal;
