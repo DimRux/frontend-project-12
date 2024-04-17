@@ -1,24 +1,39 @@
-import { useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useEffect, useContext } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { PlusSquare } from 'react-bootstrap-icons';
 import { Button } from 'react-bootstrap';
-import AddChannelModal from './AddChannelModal';
-import EditChannelModal from './EditChannelModal';
-import RemoveChannelModal from './RemoveChannelModal';
+import { initChannels } from '../../slices/channelsSlice';
+import AuthorizationContext from '../../context/AuthorizationContext';
 import Spinner from './Spinner';
 import Channels from './Channels';
 
-const ChannelsBox = () => {
+const ChannelsBox = ({ setModalVariant, handleShow }) => {
+  const dispatch = useDispatch();
+  const { getToken } = useContext(AuthorizationContext);
+  const token = getToken();
   const { t } = useTranslation();
-  const [modalVariant, setModalVariant] = useState('addChannel');
-  const [show, setShow] = useState(false);
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
+
   const addNewChannel = () => {
     setModalVariant('addChannel');
     handleShow();
   };
+
+  useEffect(() => {
+    const requestData = async () => {
+      const data = await axios.get('/api/v1/channels', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const newChannels = { channels: data.data, activeChannelId: data.data[0].id };
+      dispatch(initChannels(newChannels));
+    };
+    if (token) {
+      requestData();
+    }
+  }, [token, dispatch]);
 
   const allChannels = useSelector((state) => state.channels);
   const [activeChannel] = allChannels.channels
@@ -26,29 +41,6 @@ const ChannelsBox = () => {
   if (!activeChannel) {
     return <Spinner />;
   }
-
-  const modalFactory = (modalV) => {
-    switch (modalV) {
-      case 'addChannel':
-        return AddChannelModal;
-      case 'editChannel':
-        return EditChannelModal;
-      case 'removeChannel':
-        return RemoveChannelModal;
-      default:
-        return null;
-    }
-  };
-
-  const renderModal = () => {
-    const ModalComponent = modalFactory(modalVariant);
-
-    if (ModalComponent) {
-      return <ModalComponent show={show} handleClose={handleClose} />;
-    }
-
-    return null;
-  };
 
   return (
     <div className="col-4 col-md-2 border-end px-0 bg-light flex-column h-100 d-flex">
@@ -76,7 +68,6 @@ const ChannelsBox = () => {
           />
         ))}
       </ul>
-      {renderModal()}
     </div>
   );
 };

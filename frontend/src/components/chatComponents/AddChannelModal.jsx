@@ -1,6 +1,5 @@
 import { Formik } from 'formik';
 import { useContext, useState } from 'react';
-import axios from 'axios';
 import * as Yup from 'yup';
 import { useTranslation } from 'react-i18next';
 import filterText from 'leo-profanity';
@@ -9,8 +8,10 @@ import { Form, Button, Modal } from 'react-bootstrap';
 import AuthorizationContext from '../../context/AuthorizationContext';
 import toastify from '../../toastify';
 import { changeChannelId } from '../../slices/channelsSlice';
+import { useAddChannelMutation } from '../../slices/channelsApi';
 
 const AddChannelModal = ({ show, handleClose }) => {
+  const [addChannel] = useAddChannelMutation();
   const { t } = useTranslation();
   const dispatch = useDispatch();
   const channels = useSelector((state) => state.channels.channels);
@@ -46,12 +47,9 @@ const AddChannelModal = ({ show, handleClose }) => {
           onSubmit={async (values) => {
             try {
               setDisabled(true);
-              const name = filterText.clean(values.name);
-              const response = await axios.post('/api/v1/channels', { name }, {
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                },
-              });
+              const channel = filterText.clean(values.name);
+              const response = await addChannel(token, channel);
+              console.log(response);
               const { id } = response.data;
               dispatch(changeChannelId({ activeChannelId: id }));
               handleClose();

@@ -1,45 +1,25 @@
-import { useEffect, useContext } from 'react';
-import axios from 'axios';
-import { useDispatch } from 'react-redux';
-import { initChannels } from '../slices/channelsSlice';
-import AuthorizationContext from '../context/AuthorizationContext';
-import Nav from './Nav';
+import { useState } from 'react';
 import MessagesBox from './chatComponents/MessagesBox';
 import ChannelsBox from './chatComponents/ChannelsBox';
+import ModalsBox from './chatComponents/ModalsBox';
 
 const Chat = () => {
-  const dispatch = useDispatch();
-  const { getToken } = useContext(AuthorizationContext);
-  const token = getToken();
-
-  useEffect(() => {
-    const requestData = async () => {
-      const data = await axios.get('/api/v1/channels', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const newChannels = { channels: data.data, activeChannelId: data.data[0].id };
-      dispatch(initChannels(newChannels));
-    };
-    if (token) {
-      requestData();
-    }
-  }, [token, dispatch]);
+  const [modalVariant, setModalVariant] = useState('addChannel');
+  const [show, setShow] = useState(false);
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
 
   return (
     <div className="h-100">
       <div className="h-100" id="chat">
-        <div className="d-flex flex-column h-100">
-          <Nav button="yes" />
-          <div className="container h-100 my-4 overflow-hidden rounded shadow">
-            <div className="row h-100 bg-white flex-md-row">
-              <ChannelsBox />
-              <MessagesBox />
-            </div>
+        <div className="container h-100 my-4 overflow-hidden rounded shadow">
+          <div className="row h-100 bg-white flex-md-row">
+            <ChannelsBox setModalVariant={setModalVariant} handleShow={handleShow} />
+            <MessagesBox />
           </div>
         </div>
       </div>
+      <ModalsBox modalVariant={modalVariant} show={show} handleClose={handleClose} />
     </div>
   );
 };

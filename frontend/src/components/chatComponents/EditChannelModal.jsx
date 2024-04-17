@@ -1,15 +1,16 @@
 import { Formik } from 'formik';
 import { useContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import axios from 'axios';
 import * as Yup from 'yup';
 import filter from 'leo-profanity';
 import { useSelector } from 'react-redux';
 import { Form, Button, Modal } from 'react-bootstrap';
 import AuthorizationContext from '../../context/AuthorizationContext';
 import toastify from '../../toastify';
+import { useEditChannelMutation } from '../../slices/channelsApi';
 
 const EditChannelModal = ({ show, handleClose }) => {
+  const [editChannel] = useEditChannelMutation();
   const { t } = useTranslation();
   const channelId = useSelector((state) => state.channels.activeChannelId);
   const channels = useSelector((state) => state.channels.channels);
@@ -47,11 +48,7 @@ const EditChannelModal = ({ show, handleClose }) => {
             try {
               setDisabled(true);
               const name = filter.clean(values.name);
-              await axios.patch(`/api/v1/channels/${channelId}`, { name }, {
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                },
-              });
+              await editChannel(token, name, channelId);
               handleClose();
               toastify(t('editChannelModal.postFeedback'), 'success');
             } catch {
