@@ -1,6 +1,5 @@
 import { Formik } from 'formik';
 import { useContext, useState } from 'react';
-import axios from 'axios';
 import { ArrowRightSquare } from 'react-bootstrap-icons';
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
@@ -8,12 +7,16 @@ import { Form, Button, InputGroup } from 'react-bootstrap';
 import filterText from 'leo-profanity';
 import AuthorizationContext from '../../context/AuthorizationContext';
 import toastify from '../../toastify';
+import { useAddMessageMutation } from '../../slices/messageApi';
 
 const FormMessage = () => {
+  const [addMessage] = useAddMessageMutation();
   const { t } = useTranslation();
   const { getToken, getUsername } = useContext(AuthorizationContext);
   const channelId = useSelector((state) => state.channels.activeChannelId);
   const [isDisabled, setDisabled] = useState(false);
+  const token = getToken();
+
   return (
     <Formik
       initialValues={{ body: '' }}
@@ -21,11 +24,7 @@ const FormMessage = () => {
         try {
           setDisabled(true);
           const newMessage = { body: filterText.clean(body), channelId, username: getUsername() };
-          await axios.post('/api/v1/messages', newMessage, {
-            headers: {
-              Authorization: `Bearer ${getToken()}`,
-            },
-          });
+          await addMessage({ token, newMessage });
           resetForm();
         } catch (e) {
           toastify(t('errors.network'), 'error');
@@ -48,6 +47,7 @@ const FormMessage = () => {
               aria-label={t('formMessage.message')}
               value={values.body}
               onChange={handleChange}
+              autoFocus
             />
 
             <Button

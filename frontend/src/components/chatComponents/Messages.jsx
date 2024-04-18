@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useSelector, useDispatch } from 'react-redux';
 import AuthorizationContext from '../../context/AuthorizationContext';
 import { initMessages } from '../../slices/messagesSlice';
+import routes from '../../routes';
 
 const Messages = () => {
   const dispatch = useDispatch();
@@ -14,7 +15,7 @@ const Messages = () => {
 
   useEffect(() => {
     const requestData = async () => {
-      const data = await axios.get('/api/v1/messages', {
+      const data = await axios.get(routes.messagesApiPath, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

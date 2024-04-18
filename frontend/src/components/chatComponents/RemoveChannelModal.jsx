@@ -1,13 +1,14 @@
 import { useContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import axios from 'axios';
 import { useSelector, useDispatch } from 'react-redux';
 import { Button, Modal } from 'react-bootstrap';
 import AuthorizationContext from '../../context/AuthorizationContext';
 import { removeChannel } from '../../slices/channelsSlice';
 import toastify from '../../toastify';
+import { useDeleteChannelMutation } from '../../slices/channelsApi';
 
 const RemoveChannelModal = ({ show, handleClose }) => {
+  const [deleteChannel] = useDeleteChannelMutation();
   const { t } = useTranslation();
   const dispatch = useDispatch();
   const channelId = useSelector((state) => state.channels.activeChannelId);
@@ -18,11 +19,7 @@ const RemoveChannelModal = ({ show, handleClose }) => {
   const handleRemove = async () => {
     try {
       setDisabled(true);
-      const response = await axios.delete(`/api/v1/channels/${channelId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await deleteChannel({ token, id: channelId });
       dispatch(removeChannel(response.data));
       handleClose();
       toastify(t('removeChannelModal.postFeedback'), 'success');

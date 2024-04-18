@@ -1,31 +1,41 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import routes from '../routes';
 
 const channelsApi = createApi({
-  reducerPath: 'tasks',
-  baseQuery: fetchBaseQuery({ baseUrl: '/api/v1/channels' }),
+  reducerPath: 'channelApi',
+  baseQuery: fetchBaseQuery({ baseUrl: routes.channelsApiPath }),
   endpoints: (builder) => ({
     addChannel: builder.mutation({
-      query: (token, channel) => ({
+      query: ({ token, name }) => ({
         method: 'POST',
-        body: channel,
+        body: name,
         headers: {
           Authorization: `Bearer ${token}`,
         },
       }),
     }),
     editChannel: builder.mutation({
-      query: (token, name, id) => ({
+      query: ({ token, name, id }) => ({
         method: 'PATCH',
-        body: { name },
+        body: name,
         url: id,
         headers: {
           Authorization: `Bearer ${token}`,
         },
       }),
     }),
-    removeChannel: builder.mutation({
-      query: (token, name, id) => ({
+    deleteChannel: builder.mutation({
+      query: ({ token, id }) => ({
         method: 'DELETE',
+        url: id,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }),
+    }),
+    addMessage: builder.mutation({
+      query: ({ token, id }) => ({
+        method: 'POST',
         url: id,
         headers: {
           Authorization: `Bearer ${token}`,
@@ -38,6 +48,6 @@ const channelsApi = createApi({
 export const {
   useAddChannelMutation,
   useEditChannelMutation,
-  useRemoveChannelMutation,
+  useDeleteChannelMutation,
 } = channelsApi;
 export default channelsApi;

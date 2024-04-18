@@ -44,7 +44,7 @@ const LogIn = () => {
                   try {
                     setDisabled(true);
                     const { username, password } = values;
-                    const response = await axios.post('/api/v1/login', { username, password });
+                    const response = await axios.post(routes.loginApiPath, { username, password });
                     setToken(response.data);
                     setError('');
                     navigate(routes.chatPagePath);

@@ -47,8 +47,8 @@ const EditChannelModal = ({ show, handleClose }) => {
           onSubmit={async (values) => {
             try {
               setDisabled(true);
-              const name = filter.clean(values.name);
-              await editChannel(token, name, channelId);
+              const name = { name: filter.clean(values.name) };
+              await editChannel({ token, name, id: channelId });
               handleClose();
               toastify(t('editChannelModal.postFeedback'), 'success');
             } catch {
@@ -70,7 +70,7 @@ const EditChannelModal = ({ show, handleClose }) => {
                   name="name"
                   id="name"
                   className="mb-2"
-                  autoFocus="true"
+                  autoFocus
                   value={values.name}
                   onChange={handleChange}
                   isInvalid={errors.name}

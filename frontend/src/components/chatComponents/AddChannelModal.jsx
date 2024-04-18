@@ -47,9 +47,8 @@ const AddChannelModal = ({ show, handleClose }) => {
           onSubmit={async (values) => {
             try {
               setDisabled(true);
-              const channel = filterText.clean(values.name);
-              const response = await addChannel(token, channel);
-              console.log(response);
+              const name = { name: filterText.clean(values.name) };
+              const response = await addChannel({ token, name });
               const { id } = response.data;
               dispatch(changeChannelId({ activeChannelId: id }));
               handleClose();
@@ -72,7 +71,7 @@ const AddChannelModal = ({ show, handleClose }) => {
                   type="text"
                   name="name"
                   className="mb-2"
-                  autoFocus="true"
+                  autoFocus
                   value={values.name}
                   onChange={handleChange}
                   isInvalid={errors.name}

@@ -47,7 +47,7 @@ const SignUp = () => {
                   try {
                     setDisabled(true);
                     const { username, password } = values;
-                    const response = await axios.post('/api/v1/signup', { username, password });
+                    const response = await axios.post(routes.signUpApiPath, { username, password });
                     setToken(response.data);
                     setError('');
                     navigate(routes.chatPagePath);

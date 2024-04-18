@@ -8,6 +8,7 @@ import { initChannels } from '../../slices/channelsSlice';
 import AuthorizationContext from '../../context/AuthorizationContext';
 import Spinner from './Spinner';
 import Channels from './Channels';
+import routes from '../../routes';
 
 const ChannelsBox = ({ setModalVariant, handleShow }) => {
   const dispatch = useDispatch();
@@ -22,7 +23,7 @@ const ChannelsBox = ({ setModalVariant, handleShow }) => {
 
   useEffect(() => {
     const requestData = async () => {
-      const data = await axios.get('/api/v1/channels', {
+      const data = await axios.get(routes.channelsApiPath, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
