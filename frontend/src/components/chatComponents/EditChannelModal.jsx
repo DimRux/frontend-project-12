@@ -1,11 +1,10 @@
 import { Formik } from 'formik';
-import { useContext, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import * as Yup from 'yup';
 import filter from 'leo-profanity';
 import { useSelector } from 'react-redux';
 import { Form, Button, Modal } from 'react-bootstrap';
-import AuthorizationContext from '../../context/AuthorizationContext';
 import toastify from '../../toastify';
 import { useEditChannelMutation } from '../../slices/channelsApi';
 
@@ -15,9 +14,7 @@ const EditChannelModal = ({ show, handleClose }) => {
   const channelId = useSelector((state) => state.channels.activeChannelId);
   const channels = useSelector((state) => state.channels.channels);
   const currentChannel = channels.filter(({ id }) => id === channelId);
-  const { getToken } = useContext(AuthorizationContext);
   const [isDisabled, setDisabled] = useState(false);
-  const token = getToken();
 
   const signupSchema = Yup.object().shape({
     name: Yup.string()
@@ -48,7 +45,7 @@ const EditChannelModal = ({ show, handleClose }) => {
             try {
               setDisabled(true);
               const name = { name: filter.clean(values.name) };
-              await editChannel({ token, name, id: channelId });
+              await editChannel({ name, id: channelId });
               handleClose();
               toastify(t('editChannelModal.postFeedback'), 'success');
             } catch {

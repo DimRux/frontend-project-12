@@ -1,26 +1,20 @@
-import { useContext, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { Button, Modal } from 'react-bootstrap';
-import AuthorizationContext from '../../context/AuthorizationContext';
-import { removeChannel } from '../../slices/channelsSlice';
 import toastify from '../../toastify';
 import { useDeleteChannelMutation } from '../../slices/channelsApi';
 
 const RemoveChannelModal = ({ show, handleClose }) => {
   const [deleteChannel] = useDeleteChannelMutation();
   const { t } = useTranslation();
-  const dispatch = useDispatch();
   const channelId = useSelector((state) => state.channels.activeChannelId);
-  const { getToken } = useContext(AuthorizationContext);
   const [isDisabled, setDisabled] = useState(false);
-  const token = getToken();
 
   const handleRemove = async () => {
     try {
       setDisabled(true);
-      const response = await deleteChannel({ token, id: channelId });
-      dispatch(removeChannel(response.data));
+      await deleteChannel({ id: channelId });
       handleClose();
       toastify(t('removeChannelModal.postFeedback'), 'success');
     } catch {

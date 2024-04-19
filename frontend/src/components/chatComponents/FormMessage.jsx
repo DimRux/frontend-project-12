@@ -12,10 +12,9 @@ import { useAddMessageMutation } from '../../slices/messageApi';
 const FormMessage = () => {
   const [addMessage] = useAddMessageMutation();
   const { t } = useTranslation();
-  const { getToken, getUsername } = useContext(AuthorizationContext);
+  const { getUsername } = useContext(AuthorizationContext);
   const channelId = useSelector((state) => state.channels.activeChannelId);
   const [isDisabled, setDisabled] = useState(false);
-  const token = getToken();
 
   return (
     <Formik
@@ -24,7 +23,7 @@ const FormMessage = () => {
         try {
           setDisabled(true);
           const newMessage = { body: filterText.clean(body), channelId, username: getUsername() };
-          await addMessage({ token, newMessage });
+          await addMessage({ newMessage });
           resetForm();
         } catch (e) {
           toastify(t('errors.network'), 'error');

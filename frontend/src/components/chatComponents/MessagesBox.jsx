@@ -1,20 +1,30 @@
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
+import { useGetMessagesQuery } from '../../slices/messageApi';
+import { useGetChannelsQuery } from '../../slices/channelsApi';
 import Messages from './Messages';
 import FormMessage from './FormMessage';
 import Spinner from './Spinner';
 
 const MessagesBox = () => {
-  const { t } = useTranslation();
   const allChannels = useSelector((state) => state.channels);
-  const allMessages = useSelector((state) => state.messages);
-  const [activeChannel] = allChannels.channels
-    .filter(({ id }) => id === allChannels.activeChannelId);
-  if (!activeChannel) {
+  const { t } = useTranslation();
+  const { data: allMessages } = useGetMessagesQuery(undefined);
+  const { data: channels } = useGetChannelsQuery(undefined);
+  if (!channels) {
     return <Spinner />;
   }
-  const messagesCount = allMessages.messages
+
+  if (!allMessages) {
+    return null;
+  }
+
+  const [activeChannel] = channels
+    .filter(({ id }) => id === String(allChannels.activeChannelId));
+
+  const messagesCount = allMessages
     .filter(({ channelId }) => channelId === activeChannel.id).length;
+  console.log(activeChannel);
   const channelActive = activeChannel.name;
   const headChatMessage = `# ${channelActive}`;
 

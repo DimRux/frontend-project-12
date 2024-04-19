@@ -1,31 +1,15 @@
-import { useEffect, useContext } from 'react';
-import axios from 'axios';
-import { useSelector, useDispatch } from 'react-redux';
-import AuthorizationContext from '../../context/AuthorizationContext';
-import { initMessages } from '../../slices/messagesSlice';
-import routes from '../../routes';
+import { useSelector } from 'react-redux';
+import { useGetMessagesQuery } from '../../slices/messageApi';
 
 const Messages = () => {
-  const dispatch = useDispatch();
-  const { getToken } = useContext(AuthorizationContext);
-  const token = getToken();
   const activeChannel = useSelector((state) => state.channels.activeChannelId);
-  const allMessages = useSelector((state) => state.messages);
-  const messages = allMessages.messages.filter(({ channelId }) => channelId === activeChannel);
+  const { data } = useGetMessagesQuery(undefined);
+  console.log(data);
+  if (!data) {
+    return null;
+  }
 
-  useEffect(() => {
-    const requestData = async () => {
-      const data = await axios.get(routes.messagesApiPath, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      dispatch(initMessages(data.data));
-    };
-    if (token) {
-      requestData();
-    }
-  }, []);
+  const messages = data.filter(({ channelId }) => channelId === activeChannel);
 
   return (
     messages.map(({ body, username, id }) => (

@@ -3,49 +3,46 @@ import routes from '../routes';
 
 const channelsApi = createApi({
   reducerPath: 'channelApi',
-  baseQuery: fetchBaseQuery({ baseUrl: routes.channelsApiPath }),
+  baseQuery: fetchBaseQuery({
+    baseUrl: routes.channelsApiPath,
+    prepareHeaders: (headers) => {
+      const { token } = JSON.parse(localStorage.getItem('user'));
+      headers.set('Authorization', `Bearer ${token}`);
+      return headers;
+    },
+  }),
   endpoints: (builder) => ({
+    getChannels: builder.query({
+      query: () => '',
+      providesTags: ['Channels'],
+    }),
     addChannel: builder.mutation({
-      query: ({ token, name }) => ({
+      query: ({ name }) => ({
         method: 'POST',
         body: name,
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
       }),
+      invalidatesTags: ['Channels'],
     }),
     editChannel: builder.mutation({
-      query: ({ token, name, id }) => ({
+      query: ({ name, id }) => ({
         method: 'PATCH',
         body: name,
         url: id,
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
       }),
+      invalidatesTags: ['Channels'],
     }),
     deleteChannel: builder.mutation({
-      query: ({ token, id }) => ({
+      query: ({ id }) => ({
         method: 'DELETE',
         url: id,
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
       }),
-    }),
-    addMessage: builder.mutation({
-      query: ({ token, id }) => ({
-        method: 'POST',
-        url: id,
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }),
+      invalidatesTags: ['Channels'],
     }),
   }),
 });
 
 export const {
+  useGetChannelsQuery,
   useAddChannelMutation,
   useEditChannelMutation,
   useDeleteChannelMutation,
