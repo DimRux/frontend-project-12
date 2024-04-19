@@ -6,14 +6,16 @@ import filter from 'leo-profanity';
 import { useSelector } from 'react-redux';
 import { Form, Button, Modal } from 'react-bootstrap';
 import toastify from '../../toastify';
-import { useEditChannelMutation } from '../../slices/channelsApi';
+import { useGetChannelsQuery, useEditChannelMutation } from '../../slices/channelsApi';
 
 const EditChannelModal = ({ show, handleClose }) => {
   const [editChannel] = useEditChannelMutation();
+  const { data: channels } = useGetChannelsQuery();
   const { t } = useTranslation();
   const channelId = useSelector((state) => state.channels.activeChannelId);
-  const channels = useSelector((state) => state.channels.channels);
   const currentChannel = channels.filter(({ id }) => id === channelId);
+  console.log(currentChannel);
+  console.log(channelId);
   const [isDisabled, setDisabled] = useState(false);
 
   const signupSchema = Yup.object().shape({

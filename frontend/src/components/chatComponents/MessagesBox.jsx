@@ -9,14 +9,10 @@ import Spinner from './Spinner';
 const MessagesBox = () => {
   const allChannels = useSelector((state) => state.channels);
   const { t } = useTranslation();
-  const { data: allMessages } = useGetMessagesQuery(undefined);
-  const { data: channels } = useGetChannelsQuery(undefined);
-  if (!channels) {
+  const { data: allMessages, isLoading: messagesLoading } = useGetMessagesQuery();
+  const { data: channels, isLoading } = useGetChannelsQuery();
+  if (isLoading || messagesLoading) {
     return <Spinner />;
-  }
-
-  if (!allMessages) {
-    return null;
   }
 
   const [activeChannel] = channels
@@ -24,7 +20,6 @@ const MessagesBox = () => {
 
   const messagesCount = allMessages
     .filter(({ channelId }) => channelId === activeChannel.id).length;
-  console.log(activeChannel);
   const channelActive = activeChannel.name;
   const headChatMessage = `# ${channelActive}`;
 

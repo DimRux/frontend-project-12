@@ -3,18 +3,23 @@ import { useState } from 'react';
 import * as Yup from 'yup';
 import { useTranslation } from 'react-i18next';
 import filterText from 'leo-profanity';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { Form, Button, Modal } from 'react-bootstrap';
+import Spinner from './Spinner';
 import toastify from '../../toastify';
 import { changeChannelId } from '../../slices/channelsSlice';
-import { useAddChannelMutation } from '../../slices/channelsApi';
+import { useGetChannelsQuery, useAddChannelMutation } from '../../slices/channelsApi';
 
 const AddChannelModal = ({ show, handleClose }) => {
+  const { data: channels, isLoading } = useGetChannelsQuery();
+
   const [addChannel] = useAddChannelMutation();
   const { t } = useTranslation();
   const dispatch = useDispatch();
-  const channels = useSelector((state) => state.channels.channels);
   const [isDisabled, setDisabled] = useState(false);
+  if (isLoading) {
+    return <Spinner />;
+  }
 
   const signupSchema = Yup.object().shape({
     name: Yup.string()

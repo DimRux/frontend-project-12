@@ -4,7 +4,6 @@ import { useGetMessagesQuery } from '../../slices/messageApi';
 const Messages = () => {
   const activeChannel = useSelector((state) => state.channels.activeChannelId);
   const { data } = useGetMessagesQuery(undefined);
-  console.log(data);
   if (!data) {
     return null;
   }
