@@ -17,6 +17,8 @@ const MessagesBox = () => {
 
   const [activeChannel] = channels
     .filter(({ id }) => id === String(allChannels.activeChannelId));
+  console.log(channels);
+  console.log(allChannels.activeChannelId);
 
   const messagesCount = allMessages
     .filter(({ channelId }) => channelId === activeChannel.id).length;

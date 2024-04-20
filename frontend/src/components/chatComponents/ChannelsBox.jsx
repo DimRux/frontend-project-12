@@ -1,23 +1,14 @@
-import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { PlusSquare } from 'react-bootstrap-icons';
 import { Button } from 'react-bootstrap';
-import { useDispatch } from 'react-redux';
 import { useGetChannelsQuery } from '../../slices/channelsApi';
-import { changeChannelId } from '../../slices/channelsSlice';
 import Spinner from './Spinner';
 import Channels from './Channels';
 
 const ChannelsBox = ({ setModalVariant, handleShow }) => {
   const { data, isLoading } = useGetChannelsQuery();
-  const dispatch = useDispatch();
-  const { t } = useTranslation();
 
-  useEffect(() => {
-    if (data) {
-      dispatch(changeChannelId({ activeChannelId: data[0].id }));
-    }
-  }, [data, dispatch]);
+  const { t } = useTranslation();
 
   if (isLoading) {
     return <Spinner />;
