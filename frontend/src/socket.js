@@ -22,7 +22,10 @@ const initSocket = () => {
 
   socket.on('removeChannel', (payload) => {
     dispatch(channelsApi.util.updateQueryData('getChannels', undefined, (draft) => {
-      draft.filter((channel) => channel.id !== payload.id);
+      const index = draft.findIndex((channel) => channel.id === payload.id);
+      if (index !== -1) {
+        draft.splice(index, 1);
+      }
     }));
   });
 
