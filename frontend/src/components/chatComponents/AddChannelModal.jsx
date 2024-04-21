@@ -52,7 +52,7 @@ const AddChannelModal = ({ show, handleClose }) => {
               const name = { name: filterText.clean(values.name) };
               const response = await addChannel({ name });
               const { id } = response.data;
-              dispatch(changeChannelId({ activeChannelId: id }));
+              dispatch(changeChannelId({ activeChannelId: String(id) }));
               handleClose();
               toastify(t('addChannelModal.postFeedback'), 'success');
             } catch {

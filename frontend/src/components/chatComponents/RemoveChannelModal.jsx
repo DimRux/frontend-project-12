@@ -1,20 +1,23 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { Button, Modal } from 'react-bootstrap';
 import toastify from '../../toastify';
 import { useDeleteChannelMutation } from '../../slices/channelsApi';
+import { changeChannelId } from '../../slices/channelsSlice';
 
 const RemoveChannelModal = ({ show, handleClose }) => {
   const [deleteChannel] = useDeleteChannelMutation();
+  const dispatch = useDispatch();
   const { t } = useTranslation();
-  const channelId = useSelector((state) => state.channels.activeChannelId);
+  const channelId = String(useSelector((state) => state.channels.activeChannelId));
   const [isDisabled, setDisabled] = useState(false);
 
   const handleRemove = async () => {
     try {
       setDisabled(true);
       await deleteChannel({ id: channelId });
+      dispatch(changeChannelId({ activeChannelId: '1' }));
       handleClose();
       toastify(t('removeChannelModal.postFeedback'), 'success');
     } catch {

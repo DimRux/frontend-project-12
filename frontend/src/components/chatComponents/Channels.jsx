@@ -12,9 +12,9 @@ const Channels = ({
 }) => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
-  const channelId = useSelector((state) => state.channels.activeChannelId);
+  const channelId = String(useSelector((state) => state.channels.activeChannelId));
 
-  const changeChannel = () => dispatch(changeChannelId({ activeChannelId: id }));
+  const changeChannel = () => dispatch(changeChannelId({ activeChannelId: String(id) }));
   const renameChannel = () => {
     setModalVariant('editChannel');
     handleShow();

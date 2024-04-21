@@ -21,14 +21,15 @@ const initSocket = () => {
   });
 
   socket.on('removeChannel', (payload) => {
-    dispatch(channelsApi.util.updateQueryData('deleteChannel', undefined, (draft) => {
-      draft.push(payload);
+    dispatch(channelsApi.util.updateQueryData('getChannels', undefined, (draft) => {
+      draft.filter((channel) => channel.id !== payload.id);
     }));
   });
 
   socket.on('renameChannel', (payload) => {
     dispatch(channelsApi.util.updateQueryData('getChannels', undefined, (draft) => {
-      draft.map((item) => {
+      draft.forEach((item) => {
+        console.log(payload.id === item.id);
         if (payload.id === item.id) {
           return payload;
         }

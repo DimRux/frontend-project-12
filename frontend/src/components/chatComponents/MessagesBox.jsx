@@ -7,7 +7,7 @@ import FormMessage from './FormMessage';
 import Spinner from './Spinner';
 
 const MessagesBox = () => {
-  const allChannels = useSelector((state) => state.channels);
+  const allChannels = useSelector((state) => state.channels.activeChannelId);
   const { t } = useTranslation();
   const { data: allMessages, isLoading: messagesLoading } = useGetMessagesQuery();
   const { data: channels, isLoading } = useGetChannelsQuery();
@@ -16,12 +16,16 @@ const MessagesBox = () => {
   }
 
   const [activeChannel] = channels
-    .filter(({ id }) => id === String(allChannels.activeChannelId));
-  console.log(channels);
-  console.log(allChannels.activeChannelId);
+    .filter(({ id }) => {
+      console.log('id', id);
+      console.log('allChannels', allChannels);
+      return id === allChannels;
+    });
 
+  console.log(channels);
+  console.log(allChannels);
   const messagesCount = allMessages
-    .filter(({ channelId }) => channelId === activeChannel.id).length;
+    .filter(({ channelId }) => String(channelId) === activeChannel.id).length;
   const channelActive = activeChannel.name;
   const headChatMessage = `# ${channelActive}`;
 
