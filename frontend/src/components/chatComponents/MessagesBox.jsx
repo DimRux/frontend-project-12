@@ -7,24 +7,18 @@ import FormMessage from './FormMessage';
 import Spinner from './Spinner';
 
 const MessagesBox = () => {
-  const allChannels = useSelector((state) => state.channels.activeChannelId);
+  const activeChannelId = useSelector((state) => state.channels.activeChannelId);
   const { t } = useTranslation();
-  const { data: allMessages, isLoading: messagesLoading } = useGetMessagesQuery();
-  const { data: channels, isLoading } = useGetChannelsQuery();
-  if (isLoading || messagesLoading) {
+  const { data: allMessages, status: messageStatus } = useGetMessagesQuery();
+  const { data: channels, status } = useGetChannelsQuery();
+  if (status !== 'fulfilled' || messageStatus !== 'fulfilled') {
     return <Spinner />;
   }
 
   console.log(channels);
   const [activeChannel] = channels
-    .filter(({ id }) => {
-      console.log('id', id);
-      console.log('allChannels', allChannels);
-      return id === allChannels;
-    });
+    .filter(({ id }) => id === activeChannelId);
 
-  console.log(channels);
-  console.log(allChannels);
   const messagesCount = allMessages
     .filter(({ channelId }) => String(channelId) === activeChannel.id).length;
   const channelActive = activeChannel.name;
