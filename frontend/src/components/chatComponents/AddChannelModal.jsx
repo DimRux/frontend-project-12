@@ -3,11 +3,9 @@ import { useState } from 'react';
 import * as Yup from 'yup';
 import { useTranslation } from 'react-i18next';
 import filterText from 'leo-profanity';
-import { useDispatch } from 'react-redux';
 import { Form, Button, Modal } from 'react-bootstrap';
 import Spinner from './Spinner';
 import toastify from '../../toastify';
-import { changeChannelId } from '../../slices/channelsSlice';
 import { useGetChannelsQuery, useAddChannelMutation } from '../../slices/channelsApi';
 
 const AddChannelModal = ({ show, handleClose }) => {
@@ -15,7 +13,6 @@ const AddChannelModal = ({ show, handleClose }) => {
 
   const [addChannel] = useAddChannelMutation();
   const { t } = useTranslation();
-  const dispatch = useDispatch();
   const [isDisabled, setDisabled] = useState(false);
   if (isLoading) {
     return <Spinner />;
@@ -50,9 +47,7 @@ const AddChannelModal = ({ show, handleClose }) => {
             try {
               setDisabled(true);
               const name = { name: filterText.clean(values.name) };
-              const response = await addChannel({ name });
-              const { id } = response.data;
-              dispatch(changeChannelId({ activeChannelId: String(id) }));
+              await addChannel({ name });
               handleClose();
               toastify(t('addChannelModal.postFeedback'), 'success');
             } catch {

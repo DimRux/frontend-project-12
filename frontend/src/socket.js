@@ -31,13 +31,8 @@ const initSocket = () => {
 
   socket.on('renameChannel', (payload) => {
     dispatch(channelsApi.util.updateQueryData('getChannels', undefined, (draft) => {
-      draft.forEach((item) => {
-        console.log(payload.id === item.id);
-        if (payload.id === item.id) {
-          return payload;
-        }
-        return item;
-      });
+      const channel = draft.find((item) => item.id === payload.id);
+      channel.name = payload.name;
     }));
   });
 

@@ -14,8 +14,6 @@ const EditChannelModal = ({ show, handleClose }) => {
   const { t } = useTranslation();
   const channelId = useSelector((state) => state.channels.activeChannelId);
   const currentChannel = channels.filter(({ id }) => id === channelId);
-  console.log(currentChannel);
-  console.log(channelId);
   const [isDisabled, setDisabled] = useState(false);
 
   const signupSchema = Yup.object().shape({

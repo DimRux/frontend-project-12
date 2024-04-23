@@ -16,7 +16,6 @@ const MessagesBox = () => {
   }
 
   console.log(channels);
-
   const [activeChannel] = channels
     .filter(({ id }) => {
       console.log('id', id);
