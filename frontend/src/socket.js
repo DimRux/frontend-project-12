@@ -2,6 +2,7 @@ import { io } from 'socket.io-client';
 import store from './slices/index.js';
 import messageApi from './slices/messageApi.js';
 import channelsApi from './slices/channelsApi.js';
+import { changeChannelId } from './slices/channelsSlice.js';
 
 const { dispatch } = store;
 
@@ -27,6 +28,7 @@ const initSocket = () => {
         draft.splice(index, 1);
       }
     }));
+    dispatch(changeChannelId({ activeChannelId: '1' }));
   });
 
   socket.on('renameChannel', (payload) => {

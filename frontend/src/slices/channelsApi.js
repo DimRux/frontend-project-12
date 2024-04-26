@@ -36,7 +36,7 @@ const channelsApi = createApi({
         method: 'DELETE',
         url: id,
       }),
-      invalidatesTags: ['Channels'],
+      invalidatesTags: ['Channels', 'Messages'],
     }),
   }),
 });

@@ -15,13 +15,12 @@ const MessagesBox = () => {
     return <Spinner />;
   }
 
-  console.log(channels);
   const [activeChannel] = channels
     .filter(({ id }) => id === activeChannelId);
 
   const messagesCount = allMessages
     .filter(({ channelId }) => String(channelId) === activeChannel.id).length;
-  const channelActive = activeChannel.name;
+  const channelActive = activeChannel?.name;
   const headChatMessage = `# ${channelActive}`;
 
   return (

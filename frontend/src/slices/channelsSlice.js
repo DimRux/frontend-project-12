@@ -5,7 +5,7 @@ const initialState = {
   activeChannelId: '1',
 };
 
-const channelsSlice = createSlice({
+const uiStateSlice = createSlice({
   name: 'channels',
   initialState,
   reducers: {
@@ -26,6 +26,6 @@ const channelsSlice = createSlice({
   },
 });
 
-export const { changeChannelId } = channelsSlice.actions;
+export const { changeChannelId } = uiStateSlice.actions;
 
-export default channelsSlice.reducer;
+export default uiStateSlice.reducer;

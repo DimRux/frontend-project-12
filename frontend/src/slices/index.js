@@ -1,11 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit';
-import channelsReducer from './channelsSlice.js';
+import uiStateReducer from './channelsSlice.js';
 import channelsApi from './channelsApi.js';
 import messageApi from './messageApi.js';
 
 export default configureStore({
   reducer: {
-    channels: channelsReducer,
+    channels: uiStateReducer,
     [channelsApi.reducerPath]: channelsApi.reducer,
     [messageApi.reducerPath]: messageApi.reducer,
   },

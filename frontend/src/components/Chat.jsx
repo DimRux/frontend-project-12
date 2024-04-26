@@ -6,7 +6,7 @@ import ChannelsBox from './chatComponents/ChannelsBox';
 import ModalsBox from './chatComponents/ModalsBox';
 
 const Chat = () => {
-  const [modalVariant, setModalVariant] = useState('addChannel');
+  const [modalVariant, setModalVariant] = useState(null);
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
