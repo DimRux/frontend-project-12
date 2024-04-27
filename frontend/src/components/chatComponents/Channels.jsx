@@ -1,7 +1,7 @@
 import { useSelector, useDispatch } from 'react-redux';
 import { Button, ButtonGroup, Dropdown } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
-import { changeChannelId } from '../../slices/channelsSlice';
+import { changeChannelId } from '../../slices/uiStateSlice';
 
 const Channels = ({
   name,

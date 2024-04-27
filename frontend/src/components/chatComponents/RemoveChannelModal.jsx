@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Button, Modal } from 'react-bootstrap';
 import toastify from '../../toastify';
 import { useDeleteChannelMutation } from '../../slices/channelsApi';
-import { changeChannelId } from '../../slices/channelsSlice';
+import { changeChannelId } from '../../slices/uiStateSlice';
 
 const RemoveChannelModal = ({ show, handleClose }) => {
   const [deleteChannel] = useDeleteChannelMutation();

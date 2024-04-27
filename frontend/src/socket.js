@@ -2,7 +2,7 @@ import { io } from 'socket.io-client';
 import store from './slices/index.js';
 import messageApi from './slices/messageApi.js';
 import channelsApi from './slices/channelsApi.js';
-import { changeChannelId } from './slices/channelsSlice.js';
+import { changeChannelId } from './slices/uiStateSlice.js';
 
 const { dispatch } = store;
 

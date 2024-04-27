@@ -1,5 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit';
-import uiStateReducer from './channelsSlice.js';
+import uiStateReducer from './uiStateSlice.js';
 import channelsApi from './channelsApi.js';
 import messageApi from './messageApi.js';
 
