@@ -10,6 +10,9 @@ const uiStateSlice = createSlice({
   initialState,
   reducers: {
     changeChannelId: (state, { payload }) => {
+      if (payload?.delChannelId) {
+        return { ...state, activeChannelId: '1' };
+      }
       const { activeChannelId } = payload;
       return { ...state, activeChannelId };
     },

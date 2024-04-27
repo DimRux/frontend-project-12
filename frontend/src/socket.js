@@ -28,7 +28,7 @@ const initSocket = () => {
         draft.splice(index, 1);
       }
     }));
-    dispatch(changeChannelId({ activeChannelId: '1' }));
+    dispatch(changeChannelId({ delChannelId: String(payload.id) }));
   });
 
   socket.on('renameChannel', (payload) => {
